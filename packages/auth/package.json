@@ -1,0 +1,22 @@
+{
+  "name": "@wr-market/auth",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "devDependencies": {
+    "@wr-market/eslint-config": "*",
+    "@wr-market/prettier-config": "*",
+    "@wr-market/typescript-config": "*"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@wr-market/eslint-config/library"
+    ]
+  },
+  "prettier": "@wr-market/prettier-config",
+  "dependencies": {
+    "@casl/ability": "^6.7.1",
+    "zod": "^3.23.5"
+  }
+}
