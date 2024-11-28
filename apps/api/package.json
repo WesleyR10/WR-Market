@@ -1,0 +1,40 @@
+{
+  "name": "@wr-market/api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "yarn env:load tsx watch src/http/server.ts",
+    "db:migrate": "yarn env:load prisma migrate dev",
+    "db:studio": "yarn env:load prisma studio",
+    "env:load": "dotenv -e ../../.env --",
+    "db:seed": "yarn env:load prisma db seed",
+    "build": "tsup",
+    "start": "node dist/http/server.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.1",
+    "@prisma/client": "5.22.0",
+    "@wr-market/auth": "*",
+    "@wr-market/env": "*",
+    "bcryptjs": "^2.4.3",
+    "fastify": "^5.1.0",
+    "fastify-type-provider-zod": "^4.0.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@wr-market/eslint-config": "*",
+    "@wr-market/prettier-config": "*",
+    "@wr-market/typescript-config": "*",
+    "dotenv-cli": "^7.4.4",
+    "prisma": "^5.22.0",
+    "tsup": "^8.3.5"
+  },
+  "prettier": "@wr-market/prettier-config",
+  "eslintConfig": {
+    "extends": [
+      "@wr-market/eslint-config/node"
+    ]
+  }
+}

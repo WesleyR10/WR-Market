@@ -1,0 +1,316 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  GERENTE_GERAL
+  GERENTE_VENDAS
+  GERENTE_ESTOQUE
+  VENDEDOR
+  ESTOQUISTA
+  ENTREGADOR
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String?
+  email        String   @unique
+  passwordHash String?  @map("password_hash")
+  avatarUrl    String?  @map("avatar_url")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  tokens             Token[]
+  accounts           Account[]
+  invites            Invite[]
+  member_on          Member[]
+  owns_organizations Organization[]
+  categories         Category[]
+  products           Product[]
+  sales              Sale[]
+  purchases          Purchase[]
+  deliveries         Delivery[]
+  purchaseApprovals  Purchase[]     @relation("PurchaseApprovals")
+
+  @@map("users")
+}
+
+enum TokenType {
+  PASSWORD_RECOVER
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  type      TokenType
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  @@map("tokens")
+}
+
+enum AccountProvider {
+  GOOGLE
+}
+
+model Account {
+  id                String          @id @default(uuid())
+  provider          AccountProvider
+  providerAccountId String          @unique @map("provider_account_id")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  @@unique([provider, userId])
+  @@map("accounts")
+}
+
+model Invite {
+  id        String   @id @default(uuid())
+  email     String
+  role      Role
+  createdAt DateTime @default(now()) @map("created_at")
+
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId String? @map("author_id")
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+
+  @@unique([email, organizationId])
+  @@index([email])
+  @@map("invites")
+}
+
+model Member {
+  id   String @id @default(uuid())
+  role Role   @default(VENDEDOR)
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  @@unique([organizationId, userId])
+  @@map("members")
+}
+
+model Organization {
+  id                        String   @id @default(uuid())
+  name                      String
+  slug                      String   @unique
+  domain                    String?  @unique
+  shouldAttachUsersByDomain Boolean  @default(false) @map("should_attach_users_by_domain")
+  avatarUrl                 String?  @map("avatar_url")
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  invites Invite[]
+  members Member[]
+
+  @@map("organizations")
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  ownerId   String   @map("owner_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner    User      @relation(fields: [ownerId], references: [id])
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  ownerId     String   @map("owner_id")
+  categoryId  String   @map("category_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  owner         User           @relation(fields: [ownerId], references: [id])
+  category      Category       @relation(fields: [categoryId], references: [id])
+  stock         Stock[]
+  saleItems     SaleItem[]
+  purchaseItems PurchaseItem[]
+
+  @@map("products")
+}
+
+model Stock {
+  id        String   @id @default(uuid())
+  quantity  Int
+  productId String   @map("product_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("stock")
+}
+
+model Sale {
+  id          String     @id @default(uuid())
+  total       Decimal    @db.Decimal(10, 2)
+  status      SaleStatus @default(PENDING)
+  createdById String     @map("created_by_id")
+  clientId    String     @map("client_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  createdBy User       @relation(fields: [createdById], references: [id])
+  client    Client     @relation(fields: [clientId], references: [id])
+  items     SaleItem[]
+  delivery  Delivery?
+
+  @@map("sales")
+}
+
+model SaleItem {
+  id        String  @id @default(uuid())
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+  saleId    String  @map("sale_id")
+  productId String  @map("product_id")
+
+  sale    Sale    @relation(fields: [saleId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("sale_items")
+}
+
+model Purchase {
+  id           String         @id @default(uuid())
+  total        Decimal        @db.Decimal(10, 2)
+  status       PurchaseStatus @default(PENDING)
+  supplierId   String         @map("supplier_id")
+  createdById  String         @map("created_by_id")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  approvedById String?        @map("approved_by_id")
+
+  supplier   Supplier       @relation(fields: [supplierId], references: [id])
+  createdBy  User           @relation(fields: [createdById], references: [id])
+  approvedBy User?          @relation("PurchaseApprovals", fields: [approvedById], references: [id])
+  items      PurchaseItem[]
+
+  @@map("purchases")
+}
+
+model PurchaseItem {
+  id         String  @id @default(uuid())
+  quantity   Int
+  price      Decimal @db.Decimal(10, 2)
+  purchaseId String  @map("purchase_id")
+  productId  String  @map("product_id")
+
+  purchase Purchase @relation(fields: [purchaseId], references: [id])
+  product  Product  @relation(fields: [productId], references: [id])
+
+  @@map("purchase_items")
+}
+
+model Supplier {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?  @unique
+  phone     String?
+  cnpj      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  purchases Purchase[]
+
+  @@map("suppliers")
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?  @unique
+  phone     String?
+  cpf       String?  @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sales     Sale[]
+  addresses Address[]
+
+  @@map("clients")
+}
+
+model Address {
+  id       String @id @default(uuid())
+  street   String
+  number   String
+  district String
+  city     String
+  state    String
+  zipCode  String @map("zip_code")
+  clientId String @map("client_id")
+
+  client Client @relation(fields: [clientId], references: [id])
+
+  @@map("addresses")
+}
+
+enum DeliveryStatus {
+  PENDING
+  IN_PROGRESS
+  DELIVERED
+  CANCELLED
+}
+
+model Delivery {
+  id            String         @id @default(uuid())
+  status        DeliveryStatus @default(PENDING)
+  saleId        String         @unique @map("sale_id")
+  deliveryManId String?        @map("delivery_man_id")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  sale        Sale  @relation(fields: [saleId], references: [id])
+  deliveryMan User? @relation(fields: [deliveryManId], references: [id])
+
+  @@map("deliveries")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String
+  changes   Json
+  createdAt DateTime @default(now())
+}
+
+enum SaleStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum PurchaseStatus {
+  PENDING
+  APPROVED
+  RECEIVED
+  CANCELLED
+}
