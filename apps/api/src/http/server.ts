@@ -14,7 +14,11 @@ import {
 
 import { errorHandler } from '@/http/error-handler'
 import {
+  authenticateWithPassword,
   createAccount,
+  getProfile,
+  requestPasswordRecover,
+  resetPassword,
 } from '@/http/routes'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -125,7 +129,11 @@ app.register(fastifyJwt, {
 app.register(fastifyCors)
 
 app.register(createAccount)
-
+app.register(authenticateWithPassword)
+app.register(getProfile)
+app.register(requestPasswordRecover)
+app.register(resetPassword)
+    
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log('HTTP server running!')
