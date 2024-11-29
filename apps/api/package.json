@@ -14,6 +14,9 @@
   },
   "dependencies": {
     "@fastify/cors": "^10.0.1",
+    "@fastify/jwt": "^9.0.1",
+    "@fastify/swagger": "^9.4.0",
+    "@fastify/swagger-ui": "^5.1.0",
     "@prisma/client": "5.22.0",
     "@wr-market/auth": "*",
     "@wr-market/env": "*",
@@ -23,13 +26,18 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.2.0",
     "@types/bcryptjs": "^2.4.6",
     "@wr-market/eslint-config": "*",
     "@wr-market/prettier-config": "*",
     "@wr-market/typescript-config": "*",
     "dotenv-cli": "^7.4.4",
     "prisma": "^5.22.0",
-    "tsup": "^8.3.5"
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "prettier": "@wr-market/prettier-config",
   "eslintConfig": {
