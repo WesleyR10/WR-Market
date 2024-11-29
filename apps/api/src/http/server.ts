@@ -70,6 +70,10 @@ app.register(fastifySwagger, {
         description: 'Gestão de organizações/filiais',
       },
       { 
+        name: 'Client', 
+        description: 'Área do cliente - cadastro e gerenciamento de conta',
+      },
+      { 
         name: 'Products', 
         description: 'Gestão de produtos e categorias',
       },
@@ -88,7 +92,7 @@ app.register(fastifySwagger, {
       { 
         name: 'Deliveries', 
         description: 'Sistema de entregas e rastreamento',
-      }
+      },
     ],
     components: {
       securitySchemes: {

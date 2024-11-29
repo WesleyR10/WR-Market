@@ -167,19 +167,27 @@ model Stock {
   @@map("stock")
 }
 
+enum SaleSource {
+  ADMIN // Vendas criadas por vendedores (controladas pelo CASL)
+  ECOMMERCE // Vendas criadas por clientes (controladas por middleware)
+}
+
 model Sale {
   id          String     @id @default(uuid())
-  total       Decimal    @db.Decimal(10, 2)
   status      SaleStatus @default(PENDING)
-  createdById String     @map("created_by_id")
-  clientId    String     @map("client_id")
+  source      SaleSource @default(ADMIN)
+  total       Decimal    @db.Decimal(10, 2)
+  createdById String?    @map("created_by_id") // ID do vendedor (opcional)
+  clientId    String     @map("client_id") // ID do cliente (obrigatório)
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
 
-  createdBy User       @relation(fields: [createdById], references: [id])
-  client    Client     @relation(fields: [clientId], references: [id])
-  items     SaleItem[]
-  delivery  Delivery?
+  // Relações
+  createdBy User?  @relation(fields: [createdById], references: [id])
+  client    Client @relation(fields: [clientId], references: [id])
+
+  items    SaleItem[]
+  delivery Delivery?
 
   @@map("sales")
 }
@@ -243,18 +251,31 @@ model Supplier {
 }
 
 model Client {
-  id        String   @id @default(uuid())
-  name      String
-  email     String?  @unique
-  phone     String?
-  cpf       String?  @unique
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  name         String
+  email        String?  @unique
+  phone        String?
+  cpf          String?  @unique
+  passwordHash String?  @map("password_hash")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   sales     Sale[]
   addresses Address[]
+  tokens    ClientToken[]
 
   @@map("clients")
+}
+
+model ClientToken {
+  id        String    @id @default(uuid())
+  type      TokenType
+  createdAt DateTime  @default(now()) @map("created_at")
+  clientId  String    @map("client_id")
+  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("client_tokens")
 }
 
 model Address {

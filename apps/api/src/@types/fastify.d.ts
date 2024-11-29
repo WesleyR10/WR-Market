@@ -8,5 +8,6 @@ declare module 'fastify' {
     getUserMembership(
       slug: string,
     ): Promise<{ organization: Organization; membership: Member }>
+    clientId?: string
   }
 }
