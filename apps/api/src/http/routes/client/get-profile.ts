@@ -3,8 +3,8 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
 import { clientAuth } from '@/http/middlewares/client-auth'
-import { BadRequestError } from '@/http/routes/_errors/bad-request-error'
 import { prisma } from '@/lib/prisma'
+import { ClientNotFoundError } from '@/errors/domain/client-errors'
 
 export async function getClientProfile(app: FastifyInstance) {
   app
@@ -72,7 +72,7 @@ export async function getClientProfile(app: FastifyInstance) {
         })
 
         if (!client) {
-          throw new BadRequestError('Client not found.')
+          throw new ClientNotFoundError()
         }
 
         return reply.send({ 

@@ -256,7 +256,7 @@ model Client {
   id           String    @id @default(uuid())
   name         String
   email        String?   @unique
-  phone        String?
+  phone        String?   @unique
   cpf          String?   @unique
   passwordHash String?   @map("password_hash")
   avatarUrl    String?   @map("avatar_url")

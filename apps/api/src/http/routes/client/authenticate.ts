@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { compare } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
-import { BadRequestError } from '@/http/routes/_errors/bad-request-error'
+import { InvalidCredentialsError } from '@/errors/domain/shared-errors'
 
 export async function authenticateClient(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -42,13 +42,13 @@ export async function authenticateClient(app: FastifyInstance) {
       })
 
       if (!client || !client.passwordHash) {
-        throw new BadRequestError('Invalid credentials')
+        throw new InvalidCredentialsError()
       }
 
       const isPasswordValid = await compare(password, client.passwordHash)
 
       if (!isPasswordValid) {
-        throw new BadRequestError('Invalid credentials')
+        throw new InvalidCredentialsError()
       }
 
       const token = await reply.jwtSign(

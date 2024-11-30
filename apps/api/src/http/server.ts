@@ -12,7 +12,7 @@ import {
   ZodTypeProvider,
 } from 'fastify-type-provider-zod'
 
-import { errorHandler } from '@/http/error-handler'
+import { errorHandler } from '@/http/middlewares/error-handler'
 import {
   authenticateWithPassword,
   createAccount,
@@ -125,6 +125,7 @@ app.register(fastifySwagger, {
         },
         Error: {
           type: 'object',
+          required: ['code', 'message'],
           properties: {
             code: { type: 'string' },
             message: { type: 'string' },

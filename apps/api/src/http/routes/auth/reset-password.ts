@@ -4,7 +4,7 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
-import { UnauthorizedError } from '@/http/routes/_errors/unauthorized-error'
+import { InvalidTokenError } from '@/errors/domain/auth-errors'
 import { prisma } from '@/lib/prisma'
 
 export async function resetPassword(app: FastifyInstance) {
@@ -31,7 +31,7 @@ export async function resetPassword(app: FastifyInstance) {
       })
 
       if (!tokenFromCode) {
-        throw new UnauthorizedError()
+        throw new InvalidTokenError()
       }
 
       const passwordHash = await hash(password, env.HASH_ROUNDS)

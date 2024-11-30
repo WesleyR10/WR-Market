@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
-import { BadRequestError } from '@/http/routes/_errors/bad-request-error'
+import { InvalidRecoveryTokenError } from '@/errors/domain/client-errors'
 
 export async function resetClientPassword(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -39,7 +39,7 @@ export async function resetClientPassword(app: FastifyInstance) {
       })
 
       if (!recoveryToken) {
-        throw new BadRequestError('Invalid or expired token.')
+        throw new InvalidRecoveryTokenError()
       }
 
       const passwordHash = await hash(password, env.HASH_ROUNDS)

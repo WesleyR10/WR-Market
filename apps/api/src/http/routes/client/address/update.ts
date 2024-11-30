@@ -3,7 +3,7 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { clientAuth } from '@/http/middlewares/client-auth'
 import { prisma } from '@/lib/prisma'
-import { BadRequestError } from '@/http/routes/_errors/bad-request-error'
+import { AddressNotFoundError, AddressUnauthorizedError } from '@/errors/domain/address-errors'
 
 export async function updateClientAddress(app: FastifyInstance) {
   app
@@ -42,8 +42,12 @@ export async function updateClientAddress(app: FastifyInstance) {
           where: { id: addressId },
         })
 
-        if (!address || address.clientId !== clientId) {
-          throw new BadRequestError('Address not found.')
+        if (!address) {
+          throw new AddressNotFoundError()
+        }
+
+        if (address.clientId !== clientId) {
+          throw new AddressUnauthorizedError()
         }
 
         if (addressData.isMain) {

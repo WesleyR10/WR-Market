@@ -5,8 +5,12 @@ import { z } from 'zod'
 import { hash, compare } from 'bcryptjs'
 
 import { clientAuth } from '@/http/middlewares/client-auth'
-import { BadRequestError } from '@/http/routes/_errors/bad-request-error'
 import { prisma } from '@/lib/prisma'
+import { 
+  ClientNotFoundError, 
+  EmailInUseError,
+  InvalidPasswordError 
+} from '@/errors/domain/client-errors'
 
 export async function updateClientProfile(app: FastifyInstance) {
   app
@@ -59,7 +63,7 @@ export async function updateClientProfile(app: FastifyInstance) {
         })
 
         if (!client) {
-          throw new BadRequestError('Client not found.')
+          throw new ClientNotFoundError()
         }
 
         if (email && email !== client.email) {
@@ -68,7 +72,7 @@ export async function updateClientProfile(app: FastifyInstance) {
           })
 
           if (clientWithSameEmail) {
-            throw new BadRequestError('Email already in use.')
+            throw new EmailInUseError()
           }
         }
 
@@ -80,7 +84,7 @@ export async function updateClientProfile(app: FastifyInstance) {
           )
 
           if (!isPasswordValid) {
-            throw new BadRequestError('Invalid current password.')
+            throw new InvalidPasswordError()
           }
 
           passwordHash = await hash(newPassword, env.HASH_ROUNDS)

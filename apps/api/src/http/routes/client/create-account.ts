@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
-import { BadRequestError } from '@/http/routes/_errors/bad-request-error'
+import { EmailInUseError, CpfInUseError } from '@/errors/domain/client-errors'
 
 export async function createClientAccount(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -57,7 +57,7 @@ export async function createClientAccount(app: FastifyInstance) {
         })
 
         if (clientWithSameEmail) {
-          throw new BadRequestError('Client with same email already exists.')
+          throw new EmailInUseError()
         }
       }
 
@@ -67,7 +67,7 @@ export async function createClientAccount(app: FastifyInstance) {
         })
 
         if (clientWithSameCPF) {
-          throw new BadRequestError('Client with same CPF already exists.')
+          throw new CpfInUseError()
         }
       }
 
