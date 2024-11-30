@@ -19,6 +19,17 @@ import {
   getProfile,
   requestPasswordRecover,
   resetPassword,
+  authenticateClient, 
+  createClientAccount,
+  getClientProfile,
+  requestClientPasswordRecover,
+  resetClientPassword,
+  updateClientProfile,
+  createClientAddress,
+  updateClientAddress,
+  deleteClientAddress,
+  listClientAddresses,
+  setMainClientAddress,
 } from '@/http/routes'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -72,6 +83,10 @@ app.register(fastifySwagger, {
       { 
         name: 'Client', 
         description: 'Área do cliente - cadastro e gerenciamento de conta',
+      },
+      { 
+        name: 'Client Addresses', 
+        description: 'Gerenciamento de endereços do cliente',
       },
       { 
         name: 'Products', 
@@ -132,12 +147,27 @@ app.register(fastifyJwt, {
 
 app.register(fastifyCors)
 
+// Auth
 app.register(createAccount)
 app.register(authenticateWithPassword)
 app.register(getProfile)
-app.register(requestPasswordRecover)
 app.register(resetPassword)
-    
+
+// Client
+app.register(resetClientPassword)
+app.register(requestPasswordRecover)
+app.register(requestClientPasswordRecover)
+app.register(authenticateClient)
+app.register(createClientAccount)
+app.register(getClientProfile)
+app.register(updateClientProfile)
+
+// Client Addresses
+app.register(createClientAddress)
+app.register(updateClientAddress)
+app.register(deleteClientAddress)
+app.register(listClientAddresses)
+app.register(setMainClientAddress)
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log('HTTP server running!')

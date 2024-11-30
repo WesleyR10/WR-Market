@@ -44,6 +44,8 @@ model User {
 
 enum TokenType {
   PASSWORD_RECOVER
+  EMAIL_VERIFY
+  PHONE_VERIFY
 }
 
 model Token {
@@ -251,15 +253,17 @@ model Supplier {
 }
 
 model Client {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   name         String
-  email        String?  @unique
+  email        String?   @unique
   phone        String?
-  cpf          String?  @unique
-  passwordHash String?  @map("password_hash")
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  cpf          String?   @unique
+  passwordHash String?   @map("password_hash")
+  avatarUrl    String?   @map("avatar_url")
+  birthDate    DateTime? @map("birth_date")
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
 
   sales     Sale[]
   addresses Address[]
@@ -279,14 +283,15 @@ model ClientToken {
 }
 
 model Address {
-  id       String @id @default(uuid())
+  id       String  @id @default(uuid())
   street   String
   number   String
   district String
   city     String
   state    String
-  zipCode  String @map("zip_code")
-  clientId String @map("client_id")
+  zipCode  String  @map("zip_code")
+  isMain   Boolean @default(false) @map("is_main")
+  clientId String  @map("client_id")
 
   client Client @relation(fields: [clientId], references: [id])
 

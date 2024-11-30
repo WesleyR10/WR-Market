@@ -22,7 +22,7 @@ async function seed() {
   await prisma.organization.deleteMany()
   await prisma.user.deleteMany()
 
-  const passwordHash = await hash('123456', 1)
+  const passwordHash = await hash('123456', 6)
 
   // Create all users with different roles
   const admin = await prisma.user.create({
@@ -192,6 +192,7 @@ async function seed() {
               city: faker.location.city(),
               state: faker.location.state(),
               zipCode: faker.location.zipCode(),
+              isMain: false,
             },
           },
         },
