@@ -39,6 +39,7 @@ model User {
   deliveries         Delivery[]
   purchaseApprovals  Purchase[]     @relation("PurchaseApprovals")
 
+  @@index([email, phone])
   @@map("users")
 }
 

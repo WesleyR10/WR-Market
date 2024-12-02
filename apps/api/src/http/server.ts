@@ -30,6 +30,13 @@ import {
   deleteClientAddress,
   listClientAddresses,
   setMainClientAddress,
+  createOrganization,
+  updateOrganization,
+  getMembership,
+  getOrganization,
+  getOrganizations,
+  shutdownOrganization,
+  transferOrganization,
 } from '@/http/routes'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -153,6 +160,15 @@ app.register(createAccount)
 app.register(authenticateWithPassword)
 app.register(getProfile)
 app.register(resetPassword)
+
+// Organizations
+app.register(createOrganization)
+app.register(updateOrganization)
+app.register(getOrganizations)
+app.register(getOrganization)
+app.register(getMembership)
+app.register(shutdownOrganization)
+app.register(transferOrganization)
 
 // Client
 app.register(resetClientPassword)

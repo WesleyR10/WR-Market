@@ -1,4 +1,7 @@
 export const ErrorMessages = {
+  SHARED: {
+    INVALID_CREDENTIALS: 'Credenciais inválidas',
+  },
   AUTH: {
     INVALID_TOKEN: 'Token inválido ou expirado',
     FORBIDDEN: 'Sem permissão para acessar este recurso',
@@ -7,6 +10,16 @@ export const ErrorMessages = {
     EMAIL_IN_USE: 'Email já está em uso',
     PHONE_IN_USE: 'Telefone já está em uso',
     NO_PASSWORD: 'Usuário não possui senha cadastrada, use login social'
+  },
+  ORGANIZATION: {
+    NOT_FOUND: 'Organização não encontrada',
+    UNAUTHORIZED: 'Você não tem permissão para acessar esta organização',
+    DOMAIN_IN_USE: 'Domínio já está em uso por outra organização',
+    TRANSFER_NOT_ALLOWED: 'Você não tem permissão para transferir esta organização',
+    CREATE_NOT_ALLOWED: 'Você não tem permissão para criar esta organização',
+    DELETE_NOT_ALLOWED: 'Você não tem permissão para excluir esta organização',
+    UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar esta organização',
+    MEMBER_NOT_FOUND: 'Usuário não é membro desta organização',
   },
   CLIENT: {
     NOT_FOUND: 'Cliente não encontrado',
@@ -20,7 +33,4 @@ export const ErrorMessages = {
     UNAUTHORIZED: 'Você não tem permissão para acessar este endereço',
     MAIN_DELETION_ERROR: 'Não é possível excluir o endereço principal sem ter outro endereço cadastrado',
   },
-  SHARED: {
-    INVALID_CREDENTIALS: 'Credenciais inválidas',
-  }
 } as const 
