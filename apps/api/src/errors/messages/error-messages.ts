@@ -33,4 +33,10 @@ export const ErrorMessages = {
     UNAUTHORIZED: 'Você não tem permissão para acessar este endereço',
     MAIN_DELETION_ERROR: 'Não é possível excluir o endereço principal sem ter outro endereço cadastrado',
   },
+  CATEGORY: {
+    NOT_FOUND: 'Categoria não encontrada',
+    CREATE_NOT_ALLOWED: 'Você não tem permissão para criar categorias',
+    UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar esta categoria',
+    DELETE_NOT_ALLOWED: 'Você não tem permissão para excluir esta categoria',
+  },
 } as const 

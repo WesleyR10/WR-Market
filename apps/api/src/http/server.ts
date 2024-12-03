@@ -37,6 +37,11 @@ import {
   getOrganizations,
   shutdownOrganization,
   transferOrganization,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  getCategory,
+  listCategories,
 } from '@/http/routes'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -185,6 +190,13 @@ app.register(updateClientAddress)
 app.register(deleteClientAddress)
 app.register(listClientAddresses)
 app.register(setMainClientAddress)
+
+// Categories
+app.register(createCategory)
+app.register(updateCategory)
+app.register(deleteCategory)
+app.register(getCategory)
+app.register(listCategories)
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log('HTTP server running!')

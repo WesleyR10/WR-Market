@@ -1,0 +1,43 @@
+import { AppError } from '../base/AppError'
+import { ErrorMessages } from '../messages/error-messages'
+import { HttpStatus } from '../constants/http-status'
+
+export class CategoryNotFoundError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.CATEGORY.NOT_FOUND,
+      HttpStatus.NOT_FOUND, 
+      'CATEGORY_NOT_FOUND'
+    )
+  }
+}
+
+export class CategoryCreateNotAllowedError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.CATEGORY.CREATE_NOT_ALLOWED,
+      HttpStatus.FORBIDDEN,
+      'CATEGORY_CREATE_NOT_ALLOWED' 
+    )
+  }
+}
+
+export class CategoryUpdateNotAllowedError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.CATEGORY.UPDATE_NOT_ALLOWED,
+      HttpStatus.FORBIDDEN,
+      'CATEGORY_UPDATE_NOT_ALLOWED'
+    )
+  }
+}
+
+export class CategoryDeleteNotAllowedError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.CATEGORY.DELETE_NOT_ALLOWED,
+      HttpStatus.FORBIDDEN,
+      'CATEGORY_DELETE_NOT_ALLOWED'
+    )
+  }
+} 
