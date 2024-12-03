@@ -32,7 +32,6 @@ model User {
   invites            Invite[]
   member_on          Member[]
   owns_organizations Organization[]
-  products           Product[]
   sales              Sale[]
   purchases          Purchase[]
   deliveries         Delivery[]
@@ -99,8 +98,10 @@ model Member {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String       @map("organization_id")
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @map("user_id")
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String     @map("user_id")
+  products   Product[]
+  categories Category[]
 
   @@unique([organizationId, userId])
   @@map("members")
@@ -122,6 +123,7 @@ model Organization {
   invites    Invite[]
   members    Member[]
   categories Category[]
+  products   Product[]
 
   @@map("organizations")
 }
@@ -131,26 +133,30 @@ model Category {
   name           String
   description    String?
   organizationId String   @map("organization_id")
+  memberId       String   @map("member_id")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   organization Organization @relation(fields: [organizationId], references: [id])
+  member       Member       @relation(fields: [memberId], references: [id])
   products     Product[]
 
   @@map("categories")
 }
 
 model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  price       Decimal  @db.Decimal(10, 2)
-  ownerId     String   @map("owner_id")
-  categoryId  String   @map("category_id")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  name           String
+  description    String?
+  price          Decimal  @db.Decimal(10, 2)
+  memberId       String   @map("member_id")
+  organizationId String   @map("organization_id")
+  categoryId     String   @map("category_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  owner         User           @relation(fields: [ownerId], references: [id])
+  createdBy     Member         @relation(fields: [memberId], references: [id])
+  organization  Organization   @relation(fields: [organizationId], references: [id])
   category      Category       @relation(fields: [categoryId], references: [id])
   stock         Stock[]
   saleItems     SaleItem[]

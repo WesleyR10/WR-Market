@@ -5,66 +5,67 @@ import { z } from 'zod'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
-import { CategoryCreateNotAllowedError } from '@/errors/domain/category-errors'
+import { ProductCreateNotAllowedError } from '@/errors/domain/product-errors'
 
-export async function createCategory(app: FastifyInstance) {
+export async function createProduct(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
     .post(
-      '/organizations/:slug/categories',
+      '/organizations/:slug/products',
       {
         schema: {
-          tags: ['Categories'],
-          summary: 'Create a new category',
+          tags: ['Products'],
+          summary: 'Create a new product',
           security: [{ bearerAuth: [] }],
-          body: z.object({
-            name: z.string(),
-            description: z.string().optional(),
-          }),
           params: z.object({
             slug: z.string(),
           }),
+          body: z.object({
+            name: z.string(),
+            description: z.string(),
+            price: z.number().positive(),
+            categoryId: z.string().uuid(),
+            imageUrl: z.string().url().optional(),
+            isActive: z.boolean().default(true),
+          }),
           response: {
             201: z.object({
-              categoryId: z.string().uuid(),
+              id: z.string().uuid(),
             }),
           },
         },
       },
       async (request, reply) => {
         const { slug } = request.params
-        const { name, description } = request.body
-
         const userId = await request.getCurrentUserId()
-        const { membership } = await request.getUserMembership(slug)
+        const { organization, membership } = await request.getUserMembership(slug)
 
         const { cannot } = getUserPermissions(userId, membership.role)
 
-        if (cannot('create', 'Category')) {
-          throw new CategoryCreateNotAllowedError()
+        if (cannot('create', 'Product')) {
+          throw new ProductCreateNotAllowedError()
         }
 
-        const category = await prisma.$transaction(async (tx) => {
-          const created = await tx.category.create({
+        const product = await prisma.$transaction(async (tx) => {
+          const created = await tx.product.create({
             data: {
-              name,
-              description,
-              organizationId: membership.organizationId,
+              ...request.body,
               memberId: membership.id,
+              organizationId: organization.id,
             },
           })
+
 
           await tx.auditLog.create({
             data: {
               userId,
               action: 'CREATE',
-              entity: 'Category',
+              entity: 'Product',
               entityId: created.id,
               changes: {
-                name,
-                description,
-                organizationId: membership.organizationId,
+                old: null,
+                new: created,
               },
               createdAt: new Date(),
             },
@@ -73,9 +74,7 @@ export async function createCategory(app: FastifyInstance) {
           return created
         })
 
-        return reply.status(201).send({
-          categoryId: category.id,
-        })
+        return reply.status(201).send({ id: product.id })
       },
     )
 } 

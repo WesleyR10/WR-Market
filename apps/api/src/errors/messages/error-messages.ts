@@ -39,4 +39,10 @@ export const ErrorMessages = {
     UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar esta categoria',
     DELETE_NOT_ALLOWED: 'Você não tem permissão para excluir esta categoria',
   },
+  PRODUCT: {
+    NOT_FOUND: 'Produto não encontrado',
+    CREATE_NOT_ALLOWED: 'Você não tem permissão para criar produtos',
+    UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar este produto',
+    DELETE_NOT_ALLOWED: 'Você não tem permissão para excluir este produto',
+  },
 } as const 

@@ -35,7 +35,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
     // Gerente só pode deletar produtos/categorias se for responsável
     cannot('delete', ['Product', 'Category'])
     can('delete', ['Product', 'Category'], {
-      ownerId: { $eq: user.id },
+      memberId: { $eq: user.membership.id }
     })
   },
 
@@ -67,7 +67,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
     // Gerente só pode deletar produtos/categorias se for responsável
     cannot('delete', ['Product', 'Category'])
     can('delete', ['Product', 'Category'], {
-      ownerId: { $eq: user.id },
+      memberId: { $eq: user.membership.id }
     })
   },
 

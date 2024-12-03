@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcryptjs'
+import { randomUUID } from 'node:crypto' 
 
 const prisma = new PrismaClient()
 
@@ -23,13 +24,14 @@ async function seed() {
   await prisma.user.deleteMany()
 
   const passwordHash = await hash('123456', 6)
-
+  const adminId = randomUUID() 
   // Create all users with different roles
   const admin = await prisma.user.create({
     data: {
+      id: adminId,
       name: 'Admin User',
       email: 'admin@wrmarket.com',
-      avatarUrl: faker.image.avatarGitHub(),
+      avatarUrl: 'https://github.com/WesleyR10',
       passwordHash,
     },
   })
@@ -88,13 +90,47 @@ async function seed() {
     },
   })
 
+  // Create organization with all members first
+  const organization = await prisma.organization.create({
+    data: {
+      name: 'WR Market',
+      slug: 'wr-market',
+      domain: 'wrmarket.com',
+      shouldAttachUsersByDomain: true,
+      avatarUrl: faker.image.avatarGitHub(),
+      ownerId: admin.id,
+      members: {
+        create: [
+          { userId: admin.id, role: 'ADMIN' },
+          { userId: gerenteGeral.id, role: 'GERENTE_GERAL' },
+          { userId: gerenteVendas.id, role: 'GERENTE_VENDAS' },
+          { userId: gerenteEstoque.id, role: 'GERENTE_ESTOQUE' },
+          { userId: vendedor.id, role: 'VENDEDOR' },
+          { userId: estoquista.id, role: 'ESTOQUISTA' },
+          { userId: entregador.id, role: 'ENTREGADOR' },
+        ],
+      },
+    },
+  })
+
+  // Get member IDs for references
+  const members = await prisma.member.findMany({
+    where: {
+      organizationId: organization.id,
+    },
+  })
+
+  const gerenteEstoqueMember = members.find(m => m.userId === gerenteEstoque.id)!
+
   // Create categories (4 categories)
   const categories = await Promise.all(
     Array(4).fill(0).map(async () => {
       return prisma.category.create({
         data: {
           name: faker.commerce.department(),
-          ownerId: gerenteEstoque.id,
+          description: faker.commerce.productDescription(),
+          organizationId: organization.id,
+          memberId: gerenteEstoqueMember.id,
         },
       })
     })
@@ -109,7 +145,8 @@ async function seed() {
             name: faker.commerce.productName(),
             description: faker.commerce.productDescription(),
             price: parseFloat(faker.commerce.price()),
-            ownerId: gerenteEstoque.id,
+            memberId: gerenteEstoqueMember.id,
+            organizationId: organization.id,
             categoryId: category.id,
           },
         })
@@ -184,6 +221,8 @@ async function seed() {
           email: faker.internet.email(),
           phone: faker.phone.number(),
           cpf: faker.string.numeric(11),
+          passwordHash,
+          birthDate: faker.date.past(),
           addresses: {
             create: {
               street: faker.location.street(),
@@ -192,7 +231,7 @@ async function seed() {
               city: faker.location.city(),
               state: faker.location.state(),
               zipCode: faker.location.zipCode(),
-              isMain: false,
+              isMain: true,
             },
           },
         },
@@ -220,6 +259,7 @@ async function seed() {
           clientId: client.id,
           createdById: vendedor.id,
           status: faker.helpers.arrayElement(['PENDING', 'PAID', 'CANCELLED']),
+          source: 'ADMIN',
           total,
           items: {
             create: saleItems,
@@ -234,31 +274,6 @@ async function seed() {
       })
     })
   )
-
-  // Create organization with all members
-  await prisma.organization.create({
-    data: {
-      name: 'WR Market',
-      slug: 'wr-market',
-      domain: 'wrmarket.com',
-      shouldAttachUsersByDomain: true,
-      avatarUrl: faker.image.avatarGitHub(),
-      ownerId: admin.id,
-      members: {
-        createMany: {
-          data: [
-            { userId: admin.id, role: 'ADMIN' },
-            { userId: gerenteGeral.id, role: 'GERENTE_GERAL' },
-            { userId: gerenteVendas.id, role: 'GERENTE_VENDAS' },
-            { userId: gerenteEstoque.id, role: 'GERENTE_ESTOQUE' },
-            { userId: vendedor.id, role: 'VENDEDOR' },
-            { userId: estoquista.id, role: 'ESTOQUISTA' },
-            { userId: entregador.id, role: 'ENTREGADOR' },
-          ],
-        },
-      },
-    },
-  })
 }
 
 seed()

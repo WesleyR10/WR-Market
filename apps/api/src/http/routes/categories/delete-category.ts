@@ -36,13 +36,25 @@ export async function deleteCategory(app: FastifyInstance) {
 
         const category = await prisma.category.findUnique({
           where: { id: categoryId },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            memberId: true,
+            organizationId: true,
+          }
         })
 
         if (!category) {
           throw new CategoryNotFoundError()
         }
 
-        const authCategory = categorySchema.parse(category)
+        const authCategory = categorySchema.parse({
+          __typename: 'Category',
+          id: category.id,
+          organizationId: category.organizationId,
+          memberId: category.memberId,
+        })
         const { cannot } = getUserPermissions(userId, membership.role)
 
         if (cannot('delete', authCategory)) {

@@ -23,6 +23,7 @@ import { purchaseSubject } from './subjects/purchase'
 
 export * from './models/organization'
 export * from './models/category'
+export * from './models/product'
 export * from './models/user'
 export * from './roles'
 

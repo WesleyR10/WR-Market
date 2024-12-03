@@ -37,15 +37,12 @@ export async function updateOrganization(app: FastifyInstance) {
       },
       async (request, reply) => {
         const { slug } = request.params
-
-        const userId = await request.getCurrentUserId()
-        const { membership, organization } =
-          await request.getUserMembership(slug)
-
         const { name, domain, shouldAttachUsersByDomain } = request.body
 
-        const authOrganization = organizationSchema.parse(organization)
+        const userId = await request.getCurrentUserId()
+        const { membership, organization } = await request.getUserMembership(slug)
 
+        const authOrganization = organizationSchema.parse(organization)
         const { cannot } = getUserPermissions(userId, membership.role)
 
         if (cannot('update', authOrganization)) {
@@ -67,15 +64,39 @@ export async function updateOrganization(app: FastifyInstance) {
           }
         }
 
-        await prisma.organization.update({
-          where: {
-            id: organization.id,
-          },
-          data: {
-            name,
-            domain,
-            shouldAttachUsersByDomain,
-          },
+        await prisma.$transaction(async (tx) => {
+          const updated = await tx.organization.update({
+            where: {
+              id: organization.id,
+            },
+            data: {
+              name,
+              domain,
+              shouldAttachUsersByDomain,
+            },
+          })
+
+          await tx.auditLog.create({
+            data: {
+              userId,
+              action: 'UPDATE',
+              entity: 'Organization',
+              entityId: organization.id,
+              changes: {
+                old: {
+                  name: organization.name,
+                  domain: organization.domain,
+                  shouldAttachUsersByDomain: organization.shouldAttachUsersByDomain,
+                },
+                new: {
+                  name: updated.name,
+                  domain: updated.domain,
+                  shouldAttachUsersByDomain: updated.shouldAttachUsersByDomain,
+                },
+              },
+              createdAt: new Date(),
+            },
+          })
         })
 
         return reply.status(204).send()
