@@ -51,4 +51,11 @@ export const ErrorMessages = {
     UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar este fornecedor',
     DELETE_NOT_ALLOWED: 'Você não tem permissão para excluir este fornecedor',
   },
+  SALE: {
+    NOT_FOUND: 'Venda não encontrada',
+    CREATE_NOT_ALLOWED: 'Você não tem permissão para criar vendas',
+    UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar esta venda',
+    DELETE_NOT_ALLOWED: 'Você não tem permissão para excluir esta venda',
+    GET_NOT_ALLOWED: 'Você não tem permissão para acessar esta venda',
+  },
 } as const 
