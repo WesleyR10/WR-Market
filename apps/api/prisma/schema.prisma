@@ -102,6 +102,8 @@ model Member {
   userId     String     @map("user_id")
   products   Product[]
   categories Category[]
+  auditLog   AuditLog[]
+  suppliers  Supplier[]
 
   @@unique([organizationId, userId])
   @@map("members")
@@ -124,6 +126,7 @@ model Organization {
   members    Member[]
   categories Category[]
   products   Product[]
+  suppliers  Supplier[]
 
   @@map("organizations")
 }
@@ -192,7 +195,6 @@ model Sale {
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")
 
-  // Relações
   createdBy User?  @relation(fields: [createdById], references: [id])
   client    Client @relation(fields: [clientId], references: [id])
 
@@ -247,16 +249,21 @@ model PurchaseItem {
 }
 
 model Supplier {
-  id        String   @id @default(uuid())
-  name      String
-  email     String?  @unique
-  phone     String?
-  cnpj      String   @unique
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  name           String
+  email          String?
+  phone          String?
+  cnpj           String?
+  organizationId String
+  createdById    String
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  purchases Purchase[]
+  organization Organization @relation(fields: [organizationId], references: [id])
+  createdBy    Member       @relation(fields: [createdById], references: [id])
+  purchases    Purchase[]
 
+  @@index([organizationId, name])
   @@map("suppliers")
 }
 
@@ -329,12 +336,16 @@ model Delivery {
 
 model AuditLog {
   id        String   @id @default(uuid())
-  userId    String
+  memberId  String   @map("member_id")
   action    String
   entity    String
   entityId  String
   changes   Json
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @map("created_at")
+
+  member Member @relation(fields: [memberId], references: [id])
+
+  @@map("audit_logs")
 }
 
 enum SaleStatus {

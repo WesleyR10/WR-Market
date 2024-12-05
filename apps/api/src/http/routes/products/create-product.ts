@@ -59,7 +59,7 @@ export async function createProduct(app: FastifyInstance) {
 
           await tx.auditLog.create({
             data: {
-              userId,
+              memberId: membership.id,
               action: 'CREATE',
               entity: 'Product',
               entityId: created.id,

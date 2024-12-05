@@ -71,7 +71,7 @@ export async function deleteCategory(app: FastifyInstance) {
 
           await tx.auditLog.create({
             data: {
-              userId,
+              memberId: membership.id,
               action: 'DELETE',
               entity: 'Category',
               entityId: categoryId,

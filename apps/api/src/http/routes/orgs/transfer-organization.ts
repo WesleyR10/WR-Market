@@ -82,7 +82,7 @@ export async function transferOrganization(app: FastifyInstance) {
             entity: 'Organization',
             entityId: organization.id,
             action: 'TRANSFER_OWNERSHIP',
-            userId,
+            memberId: membership.id,
             changes: {
               fromUserId: organization.ownerId,
               toUserId: transferToUserId

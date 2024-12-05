@@ -57,7 +57,7 @@ export async function createCategory(app: FastifyInstance) {
 
           await tx.auditLog.create({
             data: {
-              userId,
+              memberId: membership.id,
               action: 'CREATE',
               entity: 'Category',
               entityId: created.id,

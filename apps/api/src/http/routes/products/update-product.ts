@@ -68,7 +68,7 @@ export async function updateProduct(app: FastifyInstance) {
 
           await tx.auditLog.create({
             data: {
-              userId,
+              memberId: membership.id,
               action: 'UPDATE',
               entity: 'Product',
               entityId: id,
