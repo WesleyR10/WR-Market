@@ -10,3 +10,18 @@ services:
       - POSTGRES_PASSWORD=docker
       - POSTGRES_DB=wr-market
 
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - "3333:3333"
+    networks:
+      - wr-market-network
+    depends_on:
+      - pg
+
+networks:
+  wr-market-network:
+    driver: bridge
+

@@ -3003,40 +3003,40 @@ tsx@^4.19.2:
   optionalDependencies:
     fsevents "~2.3.3"
 
-turbo-darwin-64@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/turbo-darwin-64/-/turbo-darwin-64-2.3.2.tgz#e257f6b7911718b1d45b7fa129506b58e38daf62"
+turbo-darwin-64@2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/turbo-darwin-64/-/turbo-darwin-64-2.3.3.tgz#875975cddf7abdb52b28e9cab234fc73ca001e80"
 
-turbo-darwin-arm64@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/turbo-darwin-arm64/-/turbo-darwin-arm64-2.3.2.tgz#96e09af5c710a62196cd313bca83dbbfab84f50f"
+turbo-darwin-arm64@2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/turbo-darwin-arm64/-/turbo-darwin-arm64-2.3.3.tgz#5e85d6dadac6560782bb91081fee56f9cfcd103e"
 
-turbo-linux-64@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/turbo-linux-64/-/turbo-linux-64-2.3.2.tgz#7508f591c6874fdd6fab54658f55489363c20b0a"
+turbo-linux-64@2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/turbo-linux-64/-/turbo-linux-64-2.3.3.tgz#634f2053cff6ff056bec7f307c2fb4dd9a2bc86f"
 
-turbo-linux-arm64@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/turbo-linux-arm64/-/turbo-linux-arm64-2.3.2.tgz#15109394c077374fbe7657129c08b75ea5008c1c"
+turbo-linux-arm64@2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/turbo-linux-arm64/-/turbo-linux-arm64-2.3.3.tgz#284e26825f5d692bffb5b126a9aeccaae6a4533b"
 
-turbo-windows-64@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/turbo-windows-64/-/turbo-windows-64-2.3.2.tgz#c15d3aa097b7396432360103b9e74991e3bb6cee"
+turbo-windows-64@2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/turbo-windows-64/-/turbo-windows-64-2.3.3.tgz#2900ac2c00d9609bc480d90564a98ca1cc7f4b17"
 
-turbo-windows-arm64@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/turbo-windows-arm64/-/turbo-windows-arm64-2.3.2.tgz#9c03ea846d706f9cf92e50ade43f8f67adf7d744"
+turbo-windows-arm64@2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/turbo-windows-arm64/-/turbo-windows-arm64-2.3.3.tgz#395508cdf6b351d7dd324fb0b318c1b2cf1d66dd"
 
-turbo@^2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/turbo/-/turbo-2.3.2.tgz#e914e7942b948f020e7629052b759d7936b9838c"
+turbo@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/turbo/-/turbo-2.3.3.tgz#70736263c75f7c0c501278214dee49859e1c7fcd"
   optionalDependencies:
-    turbo-darwin-64 "2.3.2"
-    turbo-darwin-arm64 "2.3.2"
-    turbo-linux-64 "2.3.2"
-    turbo-linux-arm64 "2.3.2"
-    turbo-windows-64 "2.3.2"
-    turbo-windows-arm64 "2.3.2"
+    turbo-darwin-64 "2.3.3"
+    turbo-darwin-arm64 "2.3.3"
+    turbo-linux-64 "2.3.3"
+    turbo-linux-arm64 "2.3.3"
+    turbo-windows-64 "2.3.3"
+    turbo-windows-arm64 "2.3.3"
 
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
@@ -3088,6 +3088,10 @@ typed-array-length@^1.0.6:
     is-typed-array "^1.1.13"
     possible-typed-array-names "^1.0.0"
     reflect.getprototypeof "^1.0.6"
+
+typescript@^5.7.2:
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.7.2.tgz#3169cf8c4c8a828cde53ba9ecb3d2b1d5dd67be6"
 
 unbox-primitive@^1.0.2:
   version "1.0.2"
