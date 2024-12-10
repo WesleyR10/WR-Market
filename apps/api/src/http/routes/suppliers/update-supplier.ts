@@ -1,10 +1,14 @@
+import { Prisma } from '@prisma/client'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import {
+  SupplierNotFoundError,
+  SupplierUpdateNotAllowedError,
+} from '@/errors/domain/supplier-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
-import { SupplierNotFoundError, SupplierUpdateNotAllowedError } from '@/errors/domain/supplier-errors'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function updateSupplier(app: FastifyInstance) {
@@ -50,7 +54,7 @@ export async function updateSupplier(app: FastifyInstance) {
           throw new SupplierUpdateNotAllowedError()
         }
 
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
           const updated = await tx.supplier.update({
             where: { id: supplierId },
             data: {
@@ -79,4 +83,4 @@ export async function updateSupplier(app: FastifyInstance) {
         return reply.status(204).send()
       },
     )
-} 
+}

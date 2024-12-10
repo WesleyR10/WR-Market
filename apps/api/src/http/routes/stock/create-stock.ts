@@ -3,59 +3,69 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
-import { ProductCreateNotAllowedError } from '@/errors/domain/product-errors'
+import {
+  StockCreateNotAllowedError,
+  StockNotFoundError,
+} from '@/errors/domain/stock-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
-export async function createProduct(app: FastifyInstance) {
+export async function createStock(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
     .post(
-      '/organizations/:slug/products',
+      '/organizations/:slug/stocks',
       {
         schema: {
-          tags: ['Products'],
-          summary: 'Create a new product',
+          tags: ['Stock'],
+          summary: 'Create a new stock entry',
           security: [{ bearerAuth: [] }],
           params: z.object({
             slug: z.string(),
           }),
           body: z.object({
-            name: z.string(),
-            description: z.string(),
-            price: z.number().positive(),
-            categoryId: z.string().uuid(),
-            imageUrl: z.string().url().optional(),
-            isActive: z.boolean().default(true),
+            productId: z.string().uuid(),
+            quantity: z.number().int().positive(),
           }),
           response: {
             201: z.object({
-              id: z.string().uuid(),
+              stockId: z.string().uuid(),
             }),
           },
         },
       },
       async (request, reply) => {
         const { slug } = request.params
+        const { productId, quantity } = request.body
+
         const userId = await request.getCurrentUserId()
-        const { organization, membership } =
-          await request.getUserMembership(slug)
+        const { membership } = await request.getUserMembership(slug)
 
         const { cannot } = getUserPermissions(userId, membership.role)
 
-        if (cannot('create', 'Product')) {
-          throw new ProductCreateNotAllowedError()
+        if (cannot('create', 'Stock')) {
+          throw new StockCreateNotAllowedError()
         }
 
-        const product = await prisma.$transaction(
+        // Verify that the product exists and belongs to the organization
+        const product = await prisma.product.findUnique({
+          where: { id: productId },
+        })
+
+        if (!product || product.organizationId !== membership.organizationId) {
+          throw new StockNotFoundError()
+        }
+
+        const stock = await prisma.$transaction(
           async (tx: Prisma.TransactionClient) => {
-            const created = await tx.product.create({
+            const created = await tx.stock.create({
               data: {
-                ...request.body,
+                productId,
+                quantity,
+                organizationId: membership.organizationId,
                 memberId: membership.id,
-                organizationId: organization.id,
               },
             })
 
@@ -63,11 +73,12 @@ export async function createProduct(app: FastifyInstance) {
               data: {
                 memberId: membership.id,
                 action: 'CREATE',
-                entity: 'Product',
+                entity: 'Stock',
                 entityId: created.id,
                 changes: {
-                  old: null,
-                  new: created,
+                  productId,
+                  quantity,
+                  organizationId: membership.organizationId,
                 },
                 createdAt: new Date(),
               },
@@ -77,7 +88,9 @@ export async function createProduct(app: FastifyInstance) {
           },
         )
 
-        return reply.status(201).send({ id: product.id })
+        return reply.status(201).send({
+          stockId: stock.id,
+        })
       },
     )
 }

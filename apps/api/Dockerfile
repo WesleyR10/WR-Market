@@ -9,7 +9,7 @@ COPY apps/api ./apps/api
 COPY packages/ ./packages/
 COPY config/ ./config/
 
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile && yarn cache clean
 ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
 WORKDIR /usr/src/app/apps/api
@@ -17,7 +17,6 @@ WORKDIR /usr/src/app/apps/api
 RUN yarn build
 
 FROM node:20-alpine3.20
-
 
 COPY --from=build /usr/src/app/apps/api/dist ./dist
 COPY --from=build /usr/src/app/apps/api/package.json ./

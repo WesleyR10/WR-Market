@@ -1,39 +1,35 @@
 import { Prisma } from '@prisma/client'
-import { productSchema } from '@wr-market/auth'
+import { stockSchema } from '@wr-market/auth'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
 import {
-  ProductNotFoundError,
-  ProductUpdateNotAllowedError,
-} from '@/errors/domain/product-errors'
+  StockNotFoundError,
+  StockUpdateNotAllowedError,
+} from '@/errors/domain/stock-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
-export async function updateProduct(app: FastifyInstance) {
+export async function updateStock(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
     .put(
-      '/organizations/:slug/products/:id',
+      '/organizations/:slug/stocks/:stockId',
       {
         schema: {
-          tags: ['Products'],
-          summary: 'Update product details',
+          tags: ['Stock'],
+          summary: 'Update stock details',
           security: [{ bearerAuth: [] }],
           params: z.object({
             slug: z.string(),
-            id: z.string().uuid(),
+            stockId: z.string().uuid(),
           }),
           body: z.object({
-            name: z.string().optional(),
-            description: z.string().optional(),
-            price: z.number().positive().optional(),
-            categoryId: z.string().uuid().optional(),
-            imageUrl: z.string().url().optional(),
-            isActive: z.boolean().optional(),
+            quantity: z.number().int().positive().optional(),
+            productId: z.string().uuid().optional(),
           }),
           response: {
             204: z.null(),
@@ -41,40 +37,42 @@ export async function updateProduct(app: FastifyInstance) {
         },
       },
       async (request, reply) => {
-        const { slug, id } = request.params
+        const { slug, stockId } = request.params
+        const updateData = request.body
+
         const userId = await request.getCurrentUserId()
         const { membership } = await request.getUserMembership(slug)
 
-        const product = await prisma.product.findUnique({
-          where: { id },
+        const stock = await prisma.stock.findUnique({
+          where: { id: stockId },
         })
 
-        if (!product) {
-          throw new ProductNotFoundError()
+        if (!stock || stock.organizationId !== membership.organizationId) {
+          throw new StockNotFoundError()
         }
 
         const { cannot } = getUserPermissions(userId, membership.role)
 
-        const authProduct = productSchema.parse(product)
+        const authStock = stockSchema.parse(stock)
 
-        if (cannot('update', authProduct)) {
-          throw new ProductUpdateNotAllowedError()
+        if (cannot('update', authStock)) {
+          throw new StockUpdateNotAllowedError()
         }
 
         await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-          const updated = await tx.product.update({
-            where: { id },
-            data: request.body,
+          const updated = await tx.stock.update({
+            where: { id: stockId },
+            data: updateData,
           })
 
           await tx.auditLog.create({
             data: {
               memberId: membership.id,
               action: 'UPDATE',
-              entity: 'Product',
-              entityId: id,
+              entity: 'Stock',
+              entityId: stockId,
               changes: {
-                old: product,
+                old: stock,
                 new: updated,
               },
               createdAt: new Date(),

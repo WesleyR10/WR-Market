@@ -1,11 +1,15 @@
+import { Prisma } from '@prisma/client'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import {
+  SaleNotFoundError,
+  SaleUpdateNotAllowedError,
+} from '@/errors/domain/sale-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
-import { SaleNotFoundError, SaleUpdateNotAllowedError } from '@/errors/domain/sale-errors'
 
 export async function updateSale(app: FastifyInstance) {
   app
@@ -22,16 +26,22 @@ export async function updateSale(app: FastifyInstance) {
             slug: z.string(),
             saleId: z.string().uuid(),
           }),
-          body: z.object({
-            status: z.enum(['PENDING', 'PAID', 'CANCELLED']).optional(),
-            items: z.array(z.object({
-              productId: z.string().uuid(),
-              quantity: z.number().int().positive(),
-              price: z.number().positive(),
-            })).optional(),
-          }).refine(data => data.status || data.items, {
-            message: 'É necessário fornecer status ou itens para atualização'
-          }),
+          body: z
+            .object({
+              status: z.enum(['PENDING', 'PAID', 'CANCELLED']).optional(),
+              items: z
+                .array(
+                  z.object({
+                    productId: z.string().uuid(),
+                    quantity: z.number().int().positive(),
+                    price: z.number().positive(),
+                  }),
+                )
+                .optional(),
+            })
+            .refine((data) => data.status || data.items, {
+              message: 'É necessário fornecer status ou itens para atualização',
+            }),
           response: {
             204: z.null(),
           },
@@ -58,7 +68,7 @@ export async function updateSale(app: FastifyInstance) {
           throw new SaleNotFoundError()
         }
 
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
           if (status) {
             await tx.sale.update({
               where: { id: saleId },
@@ -100,4 +110,4 @@ export async function updateSale(app: FastifyInstance) {
         return reply.status(204).send()
       },
     )
-} 
+}

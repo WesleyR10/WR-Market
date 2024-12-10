@@ -1,11 +1,12 @@
+import { Prisma } from '@prisma/client'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { CategoryCreateNotAllowedError } from '@/errors/domain/category-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
-import { CategoryCreateNotAllowedError } from '@/errors/domain/category-errors'
 
 export async function createCategory(app: FastifyInstance) {
   app
@@ -45,37 +46,39 @@ export async function createCategory(app: FastifyInstance) {
           throw new CategoryCreateNotAllowedError()
         }
 
-        const category = await prisma.$transaction(async (tx) => {
-          const created = await tx.category.create({
-            data: {
-              name,
-              description,
-              organizationId: membership.organizationId,
-              memberId: membership.id,
-            },
-          })
-
-          await tx.auditLog.create({
-            data: {
-              memberId: membership.id,
-              action: 'CREATE',
-              entity: 'Category',
-              entityId: created.id,
-              changes: {
+        const category = await prisma.$transaction(
+          async (tx: Prisma.TransactionClient) => {
+            const created = await tx.category.create({
+              data: {
                 name,
                 description,
                 organizationId: membership.organizationId,
+                memberId: membership.id,
               },
-              createdAt: new Date(),
-            },
-          })
+            })
 
-          return created
-        })
+            await tx.auditLog.create({
+              data: {
+                memberId: membership.id,
+                action: 'CREATE',
+                entity: 'Category',
+                entityId: created.id,
+                changes: {
+                  name,
+                  description,
+                  organizationId: membership.organizationId,
+                },
+                createdAt: new Date(),
+              },
+            })
+
+            return created
+          },
+        )
 
         return reply.status(201).send({
           categoryId: category.id,
         })
       },
     )
-} 
+}

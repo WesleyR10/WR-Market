@@ -1,0 +1,70 @@
+import type { FastifyInstance } from 'fastify'
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
+
+import {
+  StockGetNotAllowedError,
+  StockNotFoundError,
+} from '@/errors/domain/stock-errors'
+import { auth } from '@/http/middlewares/auth'
+import { prisma } from '@/lib/prisma'
+import { getUserPermissions } from '@/utils/get-user-permissions'
+
+export async function getStock(app: FastifyInstance) {
+  app
+    .withTypeProvider<ZodTypeProvider>()
+    .register(auth)
+    .get(
+      '/organizations/:slug/stocks/:stockId',
+      {
+        schema: {
+          tags: ['Stock'],
+          summary: 'Get stock details',
+          security: [{ bearerAuth: [] }],
+          params: z.object({
+            slug: z.string(),
+            stockId: z.string().uuid(),
+          }),
+          response: {
+            200: z.object({
+              stock: z.object({
+                id: z.string().uuid(),
+                quantity: z.number().int(),
+                productId: z.string().uuid(),
+                createdAt: z.string(),
+                updatedAt: z.string(),
+              }),
+            }),
+          },
+        },
+      },
+      async (request, reply) => {
+        const { slug, stockId } = request.params
+
+        const userId = await request.getCurrentUserId()
+        const { membership } = await request.getUserMembership(slug)
+
+        const { cannot } = getUserPermissions(userId, membership.role)
+
+        if (cannot('get', 'Stock')) {
+          throw new StockGetNotAllowedError()
+        }
+
+        const stock = await prisma.stock.findUnique({
+          where: { id: stockId },
+        })
+
+        if (!stock || stock.organizationId !== membership.organizationId) {
+          throw new StockNotFoundError()
+        }
+
+        return reply.send({
+          stock: {
+            ...stock,
+            createdAt: stock.createdAt.toISOString(),
+            updatedAt: stock.updatedAt.toISOString(),
+          },
+        })
+      },
+    )
+}

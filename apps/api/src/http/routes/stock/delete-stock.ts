@@ -4,62 +4,66 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
 import {
-  ProductDeleteNotAllowedError,
-  ProductNotFoundError,
-} from '@/errors/domain/product-errors'
+  StockDeleteNotAllowedError,
+  StockNotFoundError,
+} from '@/errors/domain/stock-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
-export async function deleteProduct(app: FastifyInstance) {
+export async function deleteStock(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
     .delete(
-      '/organizations/:slug/products/:id',
+      '/organizations/:slug/stocks/:stockId',
       {
         schema: {
-          tags: ['Products'],
-          summary: 'Delete a product',
+          tags: ['Stock'],
+          summary: 'Delete a stock entry',
           security: [{ bearerAuth: [] }],
           params: z.object({
             slug: z.string(),
-            id: z.string().uuid(),
+            stockId: z.string().uuid(),
           }),
+          response: {
+            204: z.null(),
+          },
         },
       },
       async (request, reply) => {
-        const { slug, id } = request.params
+        const { slug, stockId } = request.params
+
         const userId = await request.getCurrentUserId()
         const { membership } = await request.getUserMembership(slug)
 
         const { cannot } = getUserPermissions(userId, membership.role)
 
-        if (cannot('delete', 'Product')) {
-          throw new ProductDeleteNotAllowedError()
+        if (cannot('delete', 'Stock')) {
+          throw new StockDeleteNotAllowedError()
         }
 
-        const product = await prisma.product.findUnique({
-          where: { id },
+        const stock = await prisma.stock.findUnique({
+          where: { id: stockId },
         })
 
-        if (!product) {
-          throw new ProductNotFoundError()
+        if (!stock || stock.organizationId !== membership.organizationId) {
+          throw new StockNotFoundError()
         }
 
         await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-          await tx.product.delete({
-            where: { id },
+          await tx.stock.delete({
+            where: { id: stockId },
           })
 
           await tx.auditLog.create({
             data: {
               memberId: membership.id,
               action: 'DELETE',
-              entity: 'Product',
-              entityId: id,
+              entity: 'Stock',
+              entityId: stockId,
               changes: {
-                old: product,
+                old: stock,
                 new: null,
               },
               createdAt: new Date(),

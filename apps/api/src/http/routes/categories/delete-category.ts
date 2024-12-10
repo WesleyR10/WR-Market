@@ -1,12 +1,16 @@
+import { Prisma } from '@prisma/client'
+import { categorySchema } from '@wr-market/auth'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import {
+  CategoryDeleteNotAllowedError,
+  CategoryNotFoundError,
+} from '@/errors/domain/category-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
-import { CategoryNotFoundError, CategoryDeleteNotAllowedError } from '@/errors/domain/category-errors'
-import { categorySchema } from '@wr-market/auth'
 
 export async function deleteCategory(app: FastifyInstance) {
   app
@@ -42,7 +46,7 @@ export async function deleteCategory(app: FastifyInstance) {
             description: true,
             memberId: true,
             organizationId: true,
-          }
+          },
         })
 
         if (!category) {
@@ -61,11 +65,11 @@ export async function deleteCategory(app: FastifyInstance) {
           throw new CategoryDeleteNotAllowedError()
         }
 
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
           await tx.category.delete({
-            where: { 
+            where: {
               id: categoryId,
-              organizationId: membership.organizationId 
+              organizationId: membership.organizationId,
             },
           })
 
@@ -90,4 +94,4 @@ export async function deleteCategory(app: FastifyInstance) {
         return reply.status(204).send()
       },
     )
-} 
+}

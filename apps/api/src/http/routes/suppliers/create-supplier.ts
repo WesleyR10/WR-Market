@@ -1,10 +1,11 @@
+import { Prisma } from '@prisma/client'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { SupplierCreateNotAllowedError } from '@/errors/domain/supplier-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
-import { SupplierCreateNotAllowedError } from '@/errors/domain/supplier-errors'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function createSupplier(app: FastifyInstance) {
@@ -41,36 +42,38 @@ export async function createSupplier(app: FastifyInstance) {
           throw new SupplierCreateNotAllowedError()
         }
 
-        const supplier = await prisma.$transaction(async (tx) => {
-          const created = await tx.supplier.create({
-            data: {
-            name,
-            email,
-            phone,
-            cnpj,
-            organizationId: membership.organizationId,
-            createdById: userId,
-            },
-          })
+        const supplier = await prisma.$transaction(
+          async (tx: Prisma.TransactionClient) => {
+            const created = await tx.supplier.create({
+              data: {
+                name,
+                email,
+                phone,
+                cnpj,
+                organizationId: membership.organizationId,
+                createdById: userId,
+              },
+            })
 
-        await prisma.auditLog.create({
-          data: {
-            memberId: membership.id,
-            action: 'CREATE',
-            entity: 'Supplier',
-            entityId: supplier.id,
-            changes: {
-              old: null,
-              new: supplier,
-            },
-            createdAt: new Date(),
+            await prisma.auditLog.create({
+              data: {
+                memberId: membership.id,
+                action: 'CREATE',
+                entity: 'Supplier',
+                entityId: supplier.id,
+                changes: {
+                  old: null,
+                  new: supplier,
+                },
+                createdAt: new Date(),
+              },
+            })
+
+            return created
           },
-          })
-
-          return created
-        })
+        )
 
         return reply.status(201).send({ supplierId: supplier.id })
       },
     )
-} 
+}

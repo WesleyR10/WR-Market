@@ -1,12 +1,16 @@
+import { Prisma } from '@prisma/client'
+import { categorySchema } from '@wr-market/auth'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import {
+  CategoryNotFoundError,
+  CategoryUpdateNotAllowedError,
+} from '@/errors/domain/category-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
-import { CategoryNotFoundError, CategoryUpdateNotAllowedError } from '@/errors/domain/category-errors'
-import { categorySchema } from '@wr-market/auth'
 
 export async function updateCategory(app: FastifyInstance) {
   app
@@ -54,7 +58,7 @@ export async function updateCategory(app: FastifyInstance) {
           throw new CategoryUpdateNotAllowedError()
         }
 
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
           const updated = await tx.category.update({
             where: { id: categoryId },
             data: updateData,
@@ -84,4 +88,4 @@ export async function updateCategory(app: FastifyInstance) {
         return reply.status(204).send()
       },
     )
-} 
+}

@@ -5,6 +5,14 @@ import { z } from 'zod'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 
+interface Category {
+  id: string
+  name: string
+  description: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
 export async function listCategories(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
@@ -48,7 +56,7 @@ export async function listCategories(app: FastifyInstance) {
         })
 
         return reply.send({
-          categories: categories.map(category => ({
+          categories: categories.map((category: Category) => ({
             ...category,
             createdAt: category.createdAt.toISOString(),
             updatedAt: category.updatedAt.toISOString(),
@@ -56,4 +64,4 @@ export async function listCategories(app: FastifyInstance) {
         })
       },
     )
-} 
+}

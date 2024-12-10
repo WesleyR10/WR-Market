@@ -1,15 +1,16 @@
+import { Prisma } from '@prisma/client'
 import { organizationSchema } from '@wr-market/auth'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import {
+  OrganizationDomainInUseError,
+  OrganizationUpdateNotAllowedError,
+} from '@/errors/domain/organization-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
-import { 
-  OrganizationUpdateNotAllowedError,
-  OrganizationDomainInUseError 
-} from '@/errors/domain/organization-errors'
 
 export async function updateOrganization(app: FastifyInstance) {
   app
@@ -40,7 +41,8 @@ export async function updateOrganization(app: FastifyInstance) {
         const { name, domain, shouldAttachUsersByDomain } = request.body
 
         const userId = await request.getCurrentUserId()
-        const { membership, organization } = await request.getUserMembership(slug)
+        const { membership, organization } =
+          await request.getUserMembership(slug)
 
         const authOrganization = organizationSchema.parse(organization)
         const { cannot } = getUserPermissions(userId, membership.role)
@@ -64,7 +66,7 @@ export async function updateOrganization(app: FastifyInstance) {
           }
         }
 
-        await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
           const updated = await tx.organization.update({
             where: {
               id: organization.id,
@@ -86,7 +88,8 @@ export async function updateOrganization(app: FastifyInstance) {
                 old: {
                   name: organization.name,
                   domain: organization.domain,
-                  shouldAttachUsersByDomain: organization.shouldAttachUsersByDomain,
+                  shouldAttachUsersByDomain:
+                    organization.shouldAttachUsersByDomain,
                 },
                 new: {
                   name: updated.name,

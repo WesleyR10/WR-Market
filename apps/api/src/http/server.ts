@@ -57,6 +57,11 @@ import {
   deleteSale,
   getSale,
   listSales,
+  createStock,
+  getStock,
+  listStocks,
+  deleteStock,
+  updateStock,
 } from '@/http/routes'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -233,6 +238,13 @@ app.register(updateSale)
 app.register(deleteSale)
 app.register(getSale)
 app.register(listSales)
+
+// Stock
+app.register(createStock)
+app.register(updateStock)
+app.register(deleteStock)
+app.register(getStock)
+app.register(listStocks)
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log('HTTP server running!')

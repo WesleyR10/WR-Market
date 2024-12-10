@@ -9,6 +9,8 @@ services:
       - POSTGRES_USER=docker
       - POSTGRES_PASSWORD=docker
       - POSTGRES_DB=wr-market
+    networks:
+      - wr-market-network
 
   api:
     build:
@@ -20,6 +22,8 @@ services:
       - wr-market-network
     depends_on:
       - pg
+    env_file:
+      - .env
 
 networks:
   wr-market-network:
