@@ -91,6 +91,9 @@ export const permissions: Record<Role, PermissionsByRole> = {
 
     // Estoquista pode ver e criar pedidos de compra (mas não pode aprovar)
     can(['get', 'create'], 'Purchase') // Cria requisições de compra
+    can('delete', 'Purchase', {
+      createdById: { $eq: user.id },
+    }) // Deletar requisições que ele criou
     can('get', 'Supplier') // Pode ver fornecedores
   },
 

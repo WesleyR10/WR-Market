@@ -5,7 +5,6 @@ export const purchaseSchema = z.object({
   id: z.string(),
   createdById: z.string(),
   supplierId: z.string(),
-  status: z.enum(['PENDING', 'APPROVED', 'REJECTED']),
 })
 
 export type Purchase = z.infer<typeof purchaseSchema>

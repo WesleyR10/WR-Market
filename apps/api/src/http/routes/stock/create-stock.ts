@@ -79,6 +79,7 @@ export async function createStock(app: FastifyInstance) {
                   productId,
                   quantity,
                   organizationId: membership.organizationId,
+                  memberId: membership.id,
                 },
                 createdAt: new Date(),
               },

@@ -6,7 +6,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(['development', 'production', 'test'])
       .default('development'),
-    PORT: z.coerce.number().default(3333),
+    PORT: z.coerce.number().default(3334),
     DATABASE_URL: z.string().url(),
     HASH_ROUNDS: z.coerce.number().default(6),
 

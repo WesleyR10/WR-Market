@@ -105,6 +105,7 @@ model Member {
   categories Category[]
   auditLog   AuditLog[]
   suppliers  Supplier[]
+  stocks     Stock[]
 
   @@unique([organizationId, userId])
   @@map("members")
@@ -129,6 +130,8 @@ model Organization {
   products   Product[]
   suppliers  Supplier[]
   sales      Sale[]
+  purchases  Purchase[]
+  stocks     Stock[]
 
   @@map("organizations")
 }
@@ -171,15 +174,19 @@ model Product {
 }
 
 model Stock {
-  id        String   @id @default(uuid())
-  quantity  Int
-  productId String   @map("product_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id             String   @id @default(uuid())
+  quantity       Int
+  productId      String   @map("product_id")
+  organizationId String   @map("organization_id")
+  memberId       String   @map("member_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 
-  product Product @relation(fields: [productId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  member       Member       @relation(fields: [memberId], references: [id])
+  Product      Product      @relation(fields: [productId], references: [id])
 
-  @@map("stock")
+  @@map("stocks")
 }
 
 enum SaleSource {
@@ -222,20 +229,23 @@ model SaleItem {
 }
 
 model Purchase {
-  id           String         @id @default(uuid())
-  total        Decimal        @db.Decimal(10, 2)
-  status       PurchaseStatus @default(PENDING)
-  supplierId   String         @map("supplier_id")
-  createdById  String         @map("created_by_id")
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
-  approvedById String?        @map("approved_by_id")
+  id             String         @id @default(uuid())
+  total          Decimal        @db.Decimal(10, 2)
+  status         PurchaseStatus @default(PENDING)
+  supplierId     String         @map("supplier_id")
+  createdById    String         @map("created_by_id")
+  organizationId String         @map("organization_id")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  approvedById   String?        @map("approved_by_id")
 
-  supplier   Supplier       @relation(fields: [supplierId], references: [id])
-  createdBy  User           @relation(fields: [createdById], references: [id])
-  approvedBy User?          @relation("PurchaseApprovals", fields: [approvedById], references: [id])
-  items      PurchaseItem[]
+  supplier     Supplier       @relation(fields: [supplierId], references: [id])
+  createdBy    User           @relation(fields: [createdById], references: [id])
+  approvedBy   User?          @relation("PurchaseApprovals", fields: [approvedById], references: [id])
+  organization Organization   @relation(fields: [organizationId], references: [id])
+  items        PurchaseItem[]
 
+  @@index([organizationId])
   @@map("purchases")
 }
 
@@ -361,6 +371,5 @@ enum SaleStatus {
 enum PurchaseStatus {
   PENDING
   APPROVED
-  RECEIVED
-  CANCELLED
+  REJECTED
 }

@@ -23,12 +23,14 @@ import {
   createClientAddress,
   createOrganization,
   createProduct,
+  createPurchase,
   createSale,
   createStock,
   createSupplier,
   deleteCategory,
   deleteClientAddress,
   deleteProduct,
+  deletePurchase,
   deleteSale,
   deleteStock,
   deleteSupplier,
@@ -39,12 +41,14 @@ import {
   getOrganizations,
   getProduct,
   getProfile,
+  getPurchase,
   getSale,
   getStock,
   getSupplier,
   listCategories,
   listClientAddresses,
   listProducts,
+  listPurchases,
   listSales,
   listStocks,
   listSuppliers,
@@ -60,6 +64,7 @@ import {
   updateClientProfile,
   updateOrganization,
   updateProduct,
+  updatePurchase,
   updateSale,
   updateStock,
   updateSupplier,
@@ -254,6 +259,13 @@ app.register(updateStock)
 app.register(deleteStock)
 app.register(getStock)
 app.register(listStocks)
+
+// Purchases
+app.register(createPurchase)
+app.register(updatePurchase)
+app.register(deletePurchase)
+app.register(getPurchase)
+app.register(listPurchases)
 
 app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log('HTTP server running!')

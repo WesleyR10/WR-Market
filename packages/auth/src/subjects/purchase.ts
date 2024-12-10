@@ -10,6 +10,7 @@ export const purchaseSubject = z.tuple([
     z.literal('update'),
     z.literal('approve'),
     z.literal('reject'),
+    z.literal('delete'),
   ]),
   z.union([z.literal('Purchase'), purchaseSchema]),
 ])

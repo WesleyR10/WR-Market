@@ -68,4 +68,11 @@ export const ErrorMessages = {
     DELETE_NOT_ALLOWED: 'Você não tem permissão para deletar este estoque',
     GET_NOT_ALLOWED: 'Você não tem permissão para acessar este estoque',
   },
+  PURCHASE: {
+    NOT_FOUND: 'Compra não encontrada',
+    CREATE_NOT_ALLOWED: 'Você não tem permissão para criar esta compra',
+    UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar esta compra',
+    DELETE_NOT_ALLOWED: 'Você não tem permissão para deletar esta compra',
+    GET_NOT_ALLOWED: 'Você não tem permissão para acessar esta compra',
+  },
 } as const
