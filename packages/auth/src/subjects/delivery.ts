@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { deliverySchema } from '../models/delivery'
 
 export const deliverySubject = z.tuple([
@@ -12,4 +13,4 @@ export const deliverySubject = z.tuple([
   z.union([z.literal('Delivery'), deliverySchema]),
 ])
 
-export type DeliverySubject = z.infer<typeof deliverySubject> 
+export type DeliverySubject = z.infer<typeof deliverySubject>

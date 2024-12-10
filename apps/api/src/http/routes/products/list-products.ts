@@ -29,7 +29,7 @@ export async function listProducts(app: FastifyInstance) {
       },
       async (request, reply) => {
         const { slug } = request.params
-        const { organization, membership } = await request.getUserMembership(slug)
+        const { membership } = await request.getUserMembership(slug)
         const { page, perPage, search, categoryId } = request.query
 
         const [products, total] = await Promise.all([
@@ -77,4 +77,4 @@ export async function listProducts(app: FastifyInstance) {
         })
       },
     )
-} 
+}

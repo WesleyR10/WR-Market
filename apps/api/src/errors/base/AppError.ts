@@ -3,7 +3,7 @@ export class AppError extends Error {
     public message: string,
     public statusCode: number = 400,
     public code: string = 'BAD_REQUEST',
-    public details?: Record<string, any>
+    public details?: Record<string, unknown>,
   ) {
     super(message)
     this.name = this.constructor.name
@@ -17,4 +17,4 @@ export class AppError extends Error {
       details: this.details,
     }
   }
-} 
+}

@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { fastifyPlugin } from 'fastify-plugin'
+
 import { UnauthorizedError } from '@/errors/domain/auth-errors'
 
 declare module 'fastify' {
@@ -13,7 +14,7 @@ export const clientAuth = fastifyPlugin(async (app: FastifyInstance) => {
     request.getClientId = async () => {
       try {
         const token = await request.jwtVerify<{ sub: string; type: 'client' }>()
-        
+
         if (token.type !== 'client') {
           throw new UnauthorizedError()
         }

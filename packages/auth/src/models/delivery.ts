@@ -6,4 +6,4 @@ export const deliverySchema = z.object({
   deliveryManId: z.string(),
 })
 
-export type Delivery = z.infer<typeof deliverySchema> 
+export type Delivery = z.infer<typeof deliverySchema>

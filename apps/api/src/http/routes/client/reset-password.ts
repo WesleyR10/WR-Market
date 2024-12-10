@@ -1,10 +1,11 @@
-import { FastifyInstance } from 'fastify'
 import { env } from '@wr-market/env'
-import { z } from 'zod'
-import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { hash } from 'bcryptjs'
-import { prisma } from '@/lib/prisma'
+import { FastifyInstance } from 'fastify'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
+
 import { InvalidRecoveryTokenError } from '@/errors/domain/client-errors'
+import { prisma } from '@/lib/prisma'
 
 export async function resetClientPassword(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -57,4 +58,4 @@ export async function resetClientPassword(app: FastifyInstance) {
       return reply.status(201).send()
     },
   )
-} 
+}

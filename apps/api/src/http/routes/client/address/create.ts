@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
+
 import { clientAuth } from '@/http/middlewares/client-auth'
 import { prisma } from '@/lib/prisma'
 
@@ -26,7 +27,7 @@ export async function createClientAddress(app: FastifyInstance) {
           }),
           response: {
             201: z.object({
-              id: z.string().uuid()
+              id: z.string().uuid(),
             }),
           },
         },
@@ -38,11 +39,11 @@ export async function createClientAddress(app: FastifyInstance) {
         if (addressData.isMain) {
           // Se o novo endereço for principal, remove o principal anterior
           await prisma.address.updateMany({
-            where: { 
+            where: {
               clientId,
-              isMain: true 
+              isMain: true,
             },
-            data: { isMain: false }
+            data: { isMain: false },
           })
         }
 
@@ -51,10 +52,10 @@ export async function createClientAddress(app: FastifyInstance) {
             ...addressData,
             clientId,
           },
-          select: { id: true }
+          select: { id: true },
         })
 
         return reply.status(201).send(address)
-      }
+      },
     )
-} 
+}

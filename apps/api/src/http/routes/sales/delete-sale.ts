@@ -2,10 +2,13 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import {
+  SaleDeleteNotAllowedError,
+  SaleNotFoundError,
+} from '@/errors/domain/sale-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
-import { SaleNotFoundError, SaleDeleteNotAllowedError } from '@/errors/domain/sale-errors'
 
 export async function deleteSale(app: FastifyInstance) {
   app
@@ -72,4 +75,4 @@ export async function deleteSale(app: FastifyInstance) {
         return reply.status(204).send()
       },
     )
-} 
+}

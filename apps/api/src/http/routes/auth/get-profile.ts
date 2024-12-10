@@ -2,9 +2,9 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { UserNotFoundError } from '@/errors/domain/auth-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
-import { UserNotFoundError } from '@/errors/domain/auth-errors'
 
 export async function getProfile(app: FastifyInstance) {
   app

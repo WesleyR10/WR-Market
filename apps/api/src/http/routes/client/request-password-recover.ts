@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify'
-import { z } from 'zod'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
+
 import { prisma } from '@/lib/prisma'
 
 export async function requestClientPasswordRecover(app: FastifyInstance) {
@@ -10,14 +11,20 @@ export async function requestClientPasswordRecover(app: FastifyInstance) {
       schema: {
         tags: ['Client'],
         summary: 'Request client password recovery via email or phone',
-        body: z.object({
-          email: z.string().email().optional(),
-          phone: z.string()
-            .regex(/^[1-9]{2}9[0-9]{8}$/, 'Formato inválido. Use: DDD + 9 + 8 dígitos (Ex: 11912345678)')
-            .optional(),
-        }).refine(data => data.email || data.phone, {
-          message: 'É necessário fornecer email ou telefone'
-        }),
+        body: z
+          .object({
+            email: z.string().email().optional(),
+            phone: z
+              .string()
+              .regex(
+                /^[1-9]{2}9[0-9]{8}$/,
+                'Formato inválido. Use: DDD + 9 + 8 dígitos (Ex: 11912345678)',
+              )
+              .optional(),
+          })
+          .refine((data) => data.email || data.phone, {
+            message: 'É necessário fornecer email ou telefone',
+          }),
         response: {
           201: z.null(),
         },
@@ -28,10 +35,7 @@ export async function requestClientPasswordRecover(app: FastifyInstance) {
 
       const client = await prisma.client.findFirst({
         where: {
-          OR: [
-            { email: email || undefined },
-            { phone: phone || undefined },
-          ],
+          OR: [{ email: email || undefined }, { phone: phone || undefined }],
           isActive: true,
         },
       })
@@ -59,4 +63,4 @@ export async function requestClientPasswordRecover(app: FastifyInstance) {
       return reply.status(201).send()
     },
   )
-} 
+}

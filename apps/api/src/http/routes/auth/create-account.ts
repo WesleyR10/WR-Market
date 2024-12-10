@@ -1,11 +1,11 @@
-import { hash } from 'bcryptjs'
 import { env } from '@wr-market/env'
+import { hash } from 'bcryptjs'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
-import { prisma } from '@/lib/prisma'
 import { EmailInUseError, PhoneInUseError } from '@/errors/domain/auth-errors'
+import { prisma } from '@/lib/prisma'
 
 export async function createAccount(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -14,16 +14,22 @@ export async function createAccount(app: FastifyInstance) {
       schema: {
         tags: ['Auth'],
         summary: 'Create a new account',
-        body: z.object({
-          name: z.string(),
-          email: z.string().email().optional(),
-          phone: z.string()
-            .regex(/^[1-9]{2}9[0-9]{8}$/, 'Formato inválido. Use: DDD + 9 + 8 dígitos (Ex: 11912345678)')
-            .optional(),
-          password: z.string().min(6),
-        }).refine(data => data.email || data.phone, {
-          message: 'É necessário fornecer email ou telefone'
-        }),
+        body: z
+          .object({
+            name: z.string(),
+            email: z.string().email().optional(),
+            phone: z
+              .string()
+              .regex(
+                /^[1-9]{2}9[0-9]{8}$/,
+                'Formato inválido. Use: DDD + 9 + 8 dígitos (Ex: 11912345678)',
+              )
+              .optional(),
+            password: z.string().min(6),
+          })
+          .refine((data) => data.email || data.phone, {
+            message: 'É necessário fornecer email ou telefone',
+          }),
       },
     },
     async (request, reply) => {
@@ -52,7 +58,7 @@ export async function createAccount(app: FastifyInstance) {
       }
 
       // Handle auto-join organization only if email is provided
-      let autoJoinOrganization = undefined
+      let autoJoinOrganization
       if (email) {
         const [, domain] = email.split('@')
         autoJoinOrganization = await prisma.organization.findFirst({

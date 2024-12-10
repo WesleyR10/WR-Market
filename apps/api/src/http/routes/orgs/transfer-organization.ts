@@ -3,8 +3,11 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import {
+  OrganizationMemberNotFoundError,
+  OrganizationTransferNotAllowedError,
+} from '@/errors/domain/organization-errors'
 import { auth } from '@/http/middlewares/auth'
-import { OrganizationTransferNotAllowedError, OrganizationMemberNotFoundError } from '@/errors/domain/organization-errors'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
@@ -85,9 +88,9 @@ export async function transferOrganization(app: FastifyInstance) {
             memberId: membership.id,
             changes: {
               fromUserId: organization.ownerId,
-              toUserId: transferToUserId
-            }
-          }
+              toUserId: transferToUserId,
+            },
+          },
         })
 
         return reply.status(204).send()

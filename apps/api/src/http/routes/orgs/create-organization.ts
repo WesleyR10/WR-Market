@@ -2,10 +2,10 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { OrganizationDomainInUseError } from '@/errors/domain/organization-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { createSlug } from '@/utils/create-slug'
-import { OrganizationDomainInUseError } from '@/errors/domain/organization-errors'
 
 export async function createOrganization(app: FastifyInstance) {
   app

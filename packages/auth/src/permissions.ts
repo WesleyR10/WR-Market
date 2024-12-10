@@ -12,7 +12,7 @@ type PermissionsByRole = (
 export const permissions: Record<Role, PermissionsByRole> = {
   ADMIN(user, { can, cannot }) {
     can('manage', 'all')
-    
+
     // Admin só pode transferir propriedade da organização e atualizar se for dono
     cannot(['transfer_ownership', 'update'], 'Organization')
     can(['transfer_ownership', 'update'], 'Organization', {
@@ -35,7 +35,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
     // Gerente só pode deletar produtos/categorias se for responsável
     cannot('delete', ['Product', 'Category'])
     can('delete', ['Product', 'Category'], {
-      memberId: { $eq: user.membership.id }
+      memberId: { $eq: user.membership.id },
     })
   },
 
@@ -46,8 +46,8 @@ export const permissions: Record<Role, PermissionsByRole> = {
     can(['get', 'export'], 'Report')
     can('get', 'Product')
     can('get', 'Category')
-    can('manage', 'User', { 
-      role: { $eq: 'VENDEDOR' }
+    can('manage', 'User', {
+      role: { $eq: 'VENDEDOR' },
     })
   },
 
@@ -56,8 +56,8 @@ export const permissions: Record<Role, PermissionsByRole> = {
     can('manage', 'Product')
     can('manage', 'Category')
     can(['get', 'export'], 'Report')
-    can('manage', 'User', { 
-      role: { $eq: 'ESTOQUISTA' }
+    can('manage', 'User', {
+      role: { $eq: 'ESTOQUISTA' },
     })
 
     // Gerente de estoque gerencia compras e fornecedores (não tem acesso a vendas)
@@ -67,7 +67,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
     // Gerente só pode deletar produtos/categorias se for responsável
     cannot('delete', ['Product', 'Category'])
     can('delete', ['Product', 'Category'], {
-      memberId: { $eq: user.membership.id }
+      memberId: { $eq: user.membership.id },
     })
   },
 
@@ -85,7 +85,6 @@ export const permissions: Record<Role, PermissionsByRole> = {
   },
 
   ESTOQUISTA(user, { can }) {
-    
     can(['get', 'update'], 'Product')
     can('get', 'Category')
     can('manage', 'Stock')
@@ -104,5 +103,5 @@ export const permissions: Record<Role, PermissionsByRole> = {
     can('update', 'Delivery', {
       deliveryManId: { $eq: user.id },
     })
-  }
+  },
 }

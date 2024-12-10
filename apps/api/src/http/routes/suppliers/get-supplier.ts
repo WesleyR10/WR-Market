@@ -2,9 +2,9 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { SupplierNotFoundError } from '@/errors/domain/supplier-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
-import { SupplierNotFoundError } from '@/errors/domain/supplier-errors'
 
 export async function getSupplier(app: FastifyInstance) {
   app
@@ -60,4 +60,4 @@ export async function getSupplier(app: FastifyInstance) {
         return reply.status(200).send()
       },
     )
-} 
+}

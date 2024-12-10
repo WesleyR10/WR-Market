@@ -5,4 +5,4 @@ export const reportSchema = z.object({
   id: z.string(),
 })
 
-export type Report = z.infer<typeof reportSchema> 
+export type Report = z.infer<typeof reportSchema>

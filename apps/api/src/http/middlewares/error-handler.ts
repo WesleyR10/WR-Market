@@ -1,7 +1,8 @@
+import { env } from '@wr-market/env'
 import { FastifyError, FastifyReply, FastifyRequest } from 'fastify'
 import { ZodError } from 'zod'
+
 import { AppError } from '@/errors/base/AppError'
-import { env } from '@wr-market/env'
 
 export async function errorHandler(
   error: FastifyError,
@@ -16,7 +17,7 @@ export async function errorHandler(
     stack: error.stack,
     path: request.url,
     method: request.method,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   })
 
   if (error instanceof AppError) {
@@ -36,15 +37,15 @@ export async function errorHandler(
   }
 
   const isProduction = env.NODE_ENV === 'production'
-  
+
   return reply.status(500).send({
     code: 'INTERNAL_SERVER_ERROR',
-    message: isProduction 
-      ? 'Erro interno do servidor'
-      : error.message,
-    details: isProduction ? undefined : {
-      name: error.name,
-      stack: error.stack,
-    },
+    message: isProduction ? 'Erro interno do servidor' : error.message,
+    details: isProduction
+      ? undefined
+      : {
+          name: error.name,
+          stack: error.stack,
+        },
   })
-} 
+}

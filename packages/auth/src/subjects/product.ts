@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { productSchema } from '../models/product';
+
+import { productSchema } from '../models/product'
 
 export const productSubject = z.tuple([
   z.union([
@@ -12,4 +13,4 @@ export const productSubject = z.tuple([
   z.union([z.literal('Product'), productSchema]),
 ])
 
-export type ProductSubject = z.infer<typeof productSubject> 
+export type ProductSubject = z.infer<typeof productSubject>

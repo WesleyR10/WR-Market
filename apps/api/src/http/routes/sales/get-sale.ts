@@ -2,9 +2,12 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import {
+  SaleGetNotAllowedError,
+  SaleNotFoundError,
+} from '@/errors/domain/sale-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
-import { SaleGetNotAllowedError, SaleNotFoundError } from '@/errors/domain/sale-errors'
 
 export async function getSale(app: FastifyInstance) {
   app
@@ -32,12 +35,14 @@ export async function getSale(app: FastifyInstance) {
                 createdAt: z.string(),
                 updatedAt: z.string(),
                 createdBy: z.string().uuid().optional(),
-                items: z.array(z.object({
-                  id: z.string().uuid(),
-                  productId: z.string().uuid(),
-                  quantity: z.number().int().positive(),
-                  price: z.number().positive(),
-                })),
+                items: z.array(
+                  z.object({
+                    id: z.string().uuid(),
+                    productId: z.string().uuid(),
+                    quantity: z.number().int().positive(),
+                    price: z.number().positive(),
+                  }),
+                ),
               }),
             }),
           },
@@ -73,14 +78,21 @@ export async function getSale(app: FastifyInstance) {
             createdAt: sale.createdAt.toISOString(),
             updatedAt: sale.updatedAt.toISOString(),
             createdBy: sale.createdById ?? undefined,
-            items: sale.items.map(item => ({
-              id: item.id,
-              productId: item.productId,
-              quantity: item.quantity,
-              price: Number(item.price),
-            })),
+            items: sale.items.map(
+              (item: {
+                id: string
+                productId: string
+                quantity: number
+                price: number
+              }) => ({
+                id: item.id,
+                productId: item.productId,
+                quantity: item.quantity,
+                price: Number(item.price),
+              }),
+            ),
           },
         })
       },
     )
-} 
+}

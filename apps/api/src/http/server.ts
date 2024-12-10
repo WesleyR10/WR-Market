@@ -1,9 +1,10 @@
 import 'dotenv/config'
+
 import fastifyCors from '@fastify/cors'
-import { env } from '@wr-market/env'
 import fastifyJwt from '@fastify/jwt'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUI from '@fastify/swagger-ui'
+import { env } from '@wr-market/env'
 import fastify from 'fastify'
 import {
   jsonSchemaTransform,
@@ -14,54 +15,54 @@ import {
 
 import { errorHandler } from '@/http/middlewares/error-handler'
 import {
+  authenticateClient,
   authenticateWithPassword,
   createAccount,
-  getProfile,
-  requestPasswordRecover,
-  resetPassword,
-  authenticateClient, 
+  createCategory,
   createClientAccount,
-  getClientProfile,
-  requestClientPasswordRecover,
-  resetClientPassword,
-  updateClientProfile,
   createClientAddress,
-  updateClientAddress,
-  deleteClientAddress,
-  listClientAddresses,
-  setMainClientAddress,
   createOrganization,
-  updateOrganization,
+  createProduct,
+  createSale,
+  createStock,
+  createSupplier,
+  deleteCategory,
+  deleteClientAddress,
+  deleteProduct,
+  deleteSale,
+  deleteStock,
+  deleteSupplier,
+  getCategory,
+  getClientProfile,
   getMembership,
   getOrganization,
   getOrganizations,
+  getProduct,
+  getProfile,
+  getSale,
+  getStock,
+  getSupplier,
+  listCategories,
+  listClientAddresses,
+  listProducts,
+  listSales,
+  listStocks,
+  listSuppliers,
+  requestClientPasswordRecover,
+  requestPasswordRecover,
+  resetClientPassword,
+  resetPassword,
+  setMainClientAddress,
   shutdownOrganization,
   transferOrganization,
-  createCategory,
   updateCategory,
-  deleteCategory,
-  getCategory,
-  listCategories,
-  createProduct,
+  updateClientAddress,
+  updateClientProfile,
+  updateOrganization,
   updateProduct,
-  deleteProduct,
-  getProduct,
-  listProducts,
-  listSuppliers,
-  getSupplier,
-  updateSupplier,
-  createSupplier,
-  deleteSupplier,
-  createSale,
   updateSale,
-  deleteSale,
-  getSale,
-  listSales,
-  createStock,
-  getStock,
-  listStocks,
-  deleteStock,
   updateStock,
+  updateSupplier,
 } from '@/http/routes'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -100,44 +101,44 @@ app.register(fastifySwagger, {
       version: '1.0.0',
     },
     tags: [
-      { 
-        name: 'Auth', 
+      {
+        name: 'Auth',
         description: 'Autenticação e autorização',
         externalDocs: {
           description: 'Roles e Permissões',
-          url: '/docs/roles'
-        }
+          url: '/docs/roles',
+        },
       },
-      { 
-        name: 'Organizations', 
+      {
+        name: 'Organizations',
         description: 'Gestão de organizações/filiais',
       },
-      { 
-        name: 'Client', 
+      {
+        name: 'Client',
         description: 'Área do cliente - cadastro e gerenciamento de conta',
       },
-      { 
-        name: 'Client Addresses', 
+      {
+        name: 'Client Addresses',
         description: 'Gerenciamento de endereços do cliente',
       },
-      { 
-        name: 'Products', 
+      {
+        name: 'Products',
         description: 'Gestão de produtos e categorias',
       },
-      { 
-        name: 'Sales', 
+      {
+        name: 'Sales',
         description: 'Gestão de vendas e clientes',
       },
-      { 
-        name: 'Purchases', 
+      {
+        name: 'Purchases',
         description: 'Gestão de compras e fornecedores',
       },
-      { 
-        name: 'Inventory', 
+      {
+        name: 'Inventory',
         description: 'Controle de estoque',
       },
-      { 
-        name: 'Deliveries', 
+      {
+        name: 'Deliveries',
         description: 'Sistema de entregas e rastreamento',
       },
     ],
@@ -152,8 +153,16 @@ app.register(fastifySwagger, {
       schemas: {
         Role: {
           type: 'string',
-          enum: ['ADMIN', 'GERENTE_GERAL', 'GERENTE_VENDAS', 'GERENTE_ESTOQUE', 'VENDEDOR', 'ESTOQUISTA', 'ENTREGADOR'],
-          description: 'Papéis disponíveis no sistema'
+          enum: [
+            'ADMIN',
+            'GERENTE_GERAL',
+            'GERENTE_VENDAS',
+            'GERENTE_ESTOQUE',
+            'VENDEDOR',
+            'ESTOQUISTA',
+            'ENTREGADOR',
+          ],
+          description: 'Papéis disponíveis no sistema',
         },
         Error: {
           type: 'object',
@@ -161,10 +170,10 @@ app.register(fastifySwagger, {
           properties: {
             code: { type: 'string' },
             message: { type: 'string' },
-            details: { type: 'object' }
-          }
-        }
-      }
+            details: { type: 'object' },
+          },
+        },
+      },
     },
   },
   transform: jsonSchemaTransform,

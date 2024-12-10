@@ -2,9 +2,9 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { CategoryNotFoundError } from '@/errors/domain/category-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
-import { CategoryNotFoundError } from '@/errors/domain/category-errors'
 
 export async function getCategory(app: FastifyInstance) {
   app
@@ -56,4 +56,4 @@ export async function getCategory(app: FastifyInstance) {
         })
       },
     )
-} 
+}

@@ -6,4 +6,4 @@ export const supplierSchema = z.object({
   createdById: z.string(),
 })
 
-export type Supplier = z.infer<typeof supplierSchema> 
+export type Supplier = z.infer<typeof supplierSchema>

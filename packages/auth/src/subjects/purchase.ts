@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { purchaseSchema } from '../models/purchase'
 
 export const purchaseSubject = z.tuple([
@@ -11,4 +12,4 @@ export const purchaseSubject = z.tuple([
     z.literal('reject'),
   ]),
   z.union([z.literal('Purchase'), purchaseSchema]),
-]) 
+])

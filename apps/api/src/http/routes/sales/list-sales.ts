@@ -2,10 +2,10 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { SaleGetNotAllowedError } from '@/errors/domain/sale-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
-import { SaleGetNotAllowedError } from '@/errors/domain/sale-errors'
 
 export async function listSales(app: FastifyInstance) {
   app
@@ -25,16 +25,18 @@ export async function listSales(app: FastifyInstance) {
           }),
           response: {
             200: z.object({
-              sales: z.array(z.object({
-                id: z.string().uuid(),
-                clientId: z.string().uuid(),
-                total: z.number(),
-                status: z.enum(['PENDING', 'PAID', 'CANCELLED']),
-                source: z.enum(['ADMIN', 'ECOMMERCE']),
-                createdBy: z.string().uuid().optional(),
-                createdAt: z.string(),
-                updatedAt: z.string(),
-              })),
+              sales: z.array(
+                z.object({
+                  id: z.string().uuid(),
+                  clientId: z.string().uuid(),
+                  total: z.number(),
+                  status: z.enum(['PENDING', 'PAID', 'CANCELLED']),
+                  source: z.enum(['ADMIN', 'ECOMMERCE']),
+                  createdBy: z.string().uuid().optional(),
+                  createdAt: z.string(),
+                  updatedAt: z.string(),
+                }),
+              ),
             }),
           },
         },
@@ -60,17 +62,28 @@ export async function listSales(app: FastifyInstance) {
         })
 
         return reply.status(200).send({
-          sales: sales.map(sale => ({
-            id: sale.id,
-            clientId: sale.clientId,
-            total: Number(sale.total),
-            status: sale.status,
-            source: sale.source,
-            createdBy: sale.createdById ?? undefined,
-            createdAt: sale.createdAt.toISOString(),
-            updatedAt: sale.updatedAt.toISOString(),
-          })),
+          sales: sales.map(
+            (sale: {
+              id: string
+              clientId: string
+              total: number
+              status: string
+              source: string
+              createdById: string | null
+              createdAt: Date
+              updatedAt: Date
+            }) => ({
+              id: sale.id,
+              clientId: sale.clientId,
+              total: Number(sale.total),
+              status: sale.status,
+              source: sale.source,
+              createdBy: sale.createdById ?? undefined,
+              createdAt: sale.createdAt.toISOString(),
+              updatedAt: sale.updatedAt.toISOString(),
+            }),
+          ),
         })
       },
     )
-} 
+}

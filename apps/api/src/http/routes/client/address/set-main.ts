@@ -1,9 +1,13 @@
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
+
+import {
+  AddressNotFoundError,
+  AddressUnauthorizedError,
+} from '@/errors/domain/address-errors'
 import { clientAuth } from '@/http/middlewares/client-auth'
 import { prisma } from '@/lib/prisma'
-import { AddressNotFoundError, AddressUnauthorizedError } from '@/errors/domain/address-errors'
 
 export async function setMainClientAddress(app: FastifyInstance) {
   app
@@ -42,19 +46,19 @@ export async function setMainClientAddress(app: FastifyInstance) {
 
         await prisma.$transaction([
           prisma.address.updateMany({
-            where: { 
+            where: {
               clientId,
-              isMain: true 
+              isMain: true,
             },
-            data: { isMain: false }
+            data: { isMain: false },
           }),
           prisma.address.update({
             where: { id: addressId },
-            data: { isMain: true }
-          })
+            data: { isMain: true },
+          }),
         ])
 
         return reply.send()
-      }
+      },
     )
-} 
+}

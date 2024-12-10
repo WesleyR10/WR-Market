@@ -3,10 +3,10 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { OrganizationDeleteNotAllowedError } from '@/errors/domain/organization-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
-import { OrganizationDeleteNotAllowedError } from '@/errors/domain/organization-errors'
 
 export async function shutdownOrganization(app: FastifyInstance) {
   app

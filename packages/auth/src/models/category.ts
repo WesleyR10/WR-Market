@@ -7,4 +7,4 @@ export const categorySchema = z.object({
   memberId: z.string(),
 })
 
-export type Category = z.infer<typeof categorySchema> 
+export type Category = z.infer<typeof categorySchema>

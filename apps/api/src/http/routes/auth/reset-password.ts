@@ -1,5 +1,5 @@
-import { hash } from 'bcryptjs'
 import { env } from '@wr-market/env'
+import { hash } from 'bcryptjs'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'

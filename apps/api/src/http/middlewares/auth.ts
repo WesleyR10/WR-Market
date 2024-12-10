@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import { fastifyPlugin } from 'fastify-plugin'
+
 import { UnauthorizedError } from '@/errors/domain/auth-errors'
 import { prisma } from '@/lib/prisma'
 
@@ -8,7 +9,7 @@ export const auth = fastifyPlugin(async (app: FastifyInstance) => {
     request.getCurrentUserId = async () => {
       try {
         const { sub } = await request.jwtVerify<{ sub: string }>()
-        
+
         return sub
       } catch {
         throw new UnauthorizedError()

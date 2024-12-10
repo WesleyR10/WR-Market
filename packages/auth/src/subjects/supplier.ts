@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { supplierSchema } from '../models/supplier'
 
 export const supplierSubject = z.tuple([
@@ -10,4 +11,4 @@ export const supplierSubject = z.tuple([
     z.literal('delete'),
   ]),
   z.union([z.literal('Supplier'), supplierSchema]),
-]) 
+])

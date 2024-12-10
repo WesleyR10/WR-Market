@@ -11,14 +11,20 @@ export async function requestPasswordRecover(app: FastifyInstance) {
       schema: {
         tags: ['Auth'],
         summary: 'Request password recovery via email or phone',
-        body: z.object({
-          email: z.string().email().optional(),
-          phone: z.string()
-            .regex(/^[1-9]{2}9[0-9]{8}$/, 'Formato inválido. Use: DDD + 9 + 8 dígitos (Ex: 11912345678)')
-            .optional(),
-        }).refine(data => data.email || data.phone, {
-          message: 'É necessário fornecer email ou telefone'
-        }),
+        body: z
+          .object({
+            email: z.string().email().optional(),
+            phone: z
+              .string()
+              .regex(
+                /^[1-9]{2}9[0-9]{8}$/,
+                'Formato inválido. Use: DDD + 9 + 8 dígitos (Ex: 11912345678)',
+              )
+              .optional(),
+          })
+          .refine((data) => data.email || data.phone, {
+            message: 'É necessário fornecer email ou telefone',
+          }),
         response: {
           201: z.null(),
         },
@@ -29,10 +35,7 @@ export async function requestPasswordRecover(app: FastifyInstance) {
 
       const user = await prisma.user.findFirst({
         where: {
-          OR: [
-            { email: email || undefined },
-            { phone: phone || undefined },
-          ],
+          OR: [{ email: email || undefined }, { phone: phone || undefined }],
         },
       })
 

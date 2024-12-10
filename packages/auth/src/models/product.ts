@@ -7,4 +7,4 @@ export const productSchema = z.object({
   memberId: z.string(),
 })
 
-export type Product = z.infer<typeof productSchema> 
+export type Product = z.infer<typeof productSchema>

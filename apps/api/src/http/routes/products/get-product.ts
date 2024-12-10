@@ -2,9 +2,9 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { ProductNotFoundError } from '@/errors/domain/product-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
-import { ProductNotFoundError } from '@/errors/domain/product-errors'
 
 export async function getProduct(app: FastifyInstance) {
   app
@@ -32,9 +32,9 @@ export async function getProduct(app: FastifyInstance) {
             stock: true,
             createdBy: {
               include: {
-                user: true
-              }
-            }
+                user: true,
+              },
+            },
           },
         })
 
@@ -45,4 +45,4 @@ export async function getProduct(app: FastifyInstance) {
         return reply.send({ product })
       },
     )
-} 
+}

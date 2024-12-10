@@ -1,9 +1,10 @@
-import { FastifyInstance } from 'fastify'
-import { z } from 'zod'
-import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { compare } from 'bcryptjs'
-import { prisma } from '@/lib/prisma'
+import { FastifyInstance } from 'fastify'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
+
 import { InvalidCredentialsError } from '@/errors/domain/shared-errors'
+import { prisma } from '@/lib/prisma'
 
 export async function authenticateClient(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -12,15 +13,18 @@ export async function authenticateClient(app: FastifyInstance) {
       schema: {
         tags: ['Client'],
         summary: 'Authenticate client with email/phone & password',
-        body: z.object({
-          email: z.string().email().optional(),
-          phone: z.string()
-            .regex(/^[1-9]{2}9[0-9]{8}$/)
-            .optional(),
-          password: z.string(),
-        }).refine(data => data.email || data.phone, {
-          message: 'É necessário fornecer email ou telefone'
-        }),
+        body: z
+          .object({
+            email: z.string().email().optional(),
+            phone: z
+              .string()
+              .regex(/^[1-9]{2}9[0-9]{8}$/)
+              .optional(),
+            password: z.string(),
+          })
+          .refine((data) => data.email || data.phone, {
+            message: 'É necessário fornecer email ou telefone',
+          }),
         response: {
           201: z.object({
             token: z.string(),
@@ -33,10 +37,7 @@ export async function authenticateClient(app: FastifyInstance) {
 
       const client = await prisma.client.findFirst({
         where: {
-          OR: [
-            { email: email || undefined },
-            { phone: phone || undefined },
-          ],
+          OR: [{ email: email || undefined }, { phone: phone || undefined }],
           isActive: true,
         },
       })
@@ -66,4 +67,4 @@ export async function authenticateClient(app: FastifyInstance) {
       return reply.status(201).send({ token })
     },
   )
-} 
+}

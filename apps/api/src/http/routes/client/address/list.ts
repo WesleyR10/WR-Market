@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
+
 import { clientAuth } from '@/http/middlewares/client-auth'
 import { prisma } from '@/lib/prisma'
 
@@ -17,16 +18,18 @@ export async function listClientAddresses(app: FastifyInstance) {
           security: [{ bearerAuth: [] }],
           response: {
             200: z.object({
-              addresses: z.array(z.object({
-                id: z.string().uuid(),
-                street: z.string(),
-                number: z.string(),
-                district: z.string(),
-                city: z.string(),
-                state: z.string(),
-                zipCode: z.string(),
-                isMain: z.boolean(),
-              })),
+              addresses: z.array(
+                z.object({
+                  id: z.string().uuid(),
+                  street: z.string(),
+                  number: z.string(),
+                  district: z.string(),
+                  city: z.string(),
+                  state: z.string(),
+                  zipCode: z.string(),
+                  isMain: z.boolean(),
+                }),
+              ),
             }),
           },
         },
@@ -36,12 +39,10 @@ export async function listClientAddresses(app: FastifyInstance) {
 
         const addresses = await prisma.address.findMany({
           where: { clientId },
-          orderBy: [
-            { isMain: 'desc' },
-          ]
+          orderBy: [{ isMain: 'desc' }],
         })
 
         return reply.send({ addresses })
-      }
+      },
     )
-} 
+}

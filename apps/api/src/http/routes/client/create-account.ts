@@ -1,10 +1,11 @@
-import { FastifyInstance } from 'fastify'
 import { env } from '@wr-market/env'
-import { z } from 'zod'
-import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { hash } from 'bcryptjs'
+import { FastifyInstance } from 'fastify'
+import { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
+
+import { CpfInUseError, EmailInUseError } from '@/errors/domain/client-errors'
 import { prisma } from '@/lib/prisma'
-import { EmailInUseError, CpfInUseError } from '@/errors/domain/client-errors'
 
 export async function createClientAccount(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -13,42 +14,47 @@ export async function createClientAccount(app: FastifyInstance) {
       schema: {
         tags: ['Client'],
         summary: 'Create a new client account',
-        body: z.object({
-          name: z.string(),
-          email: z.string().email().optional(),
-          phone: z.string()
-            .regex(/^[1-9]{2}9[0-9]{8}$/)
-            .optional(),
-          cpf: z.string().length(11).optional(),
-          password: z.string().min(6),
-          birthDate: z.string().datetime().optional(),
-          avatarUrl: z.string().url().optional(),
-          address: z.object({
-            street: z.string(),
-            number: z.string(),
-            district: z.string(),
-            city: z.string(),
-            state: z.string(),
-            zipCode: z.string(),
-          }).optional(),
-        }).refine(data => data.email || data.phone, {
-          message: 'É necessário fornecer email ou telefone'
-        }),
+        body: z
+          .object({
+            name: z.string(),
+            email: z.string().email().optional(),
+            phone: z
+              .string()
+              .regex(/^[1-9]{2}9[0-9]{8}$/)
+              .optional(),
+            cpf: z.string().length(11).optional(),
+            password: z.string().min(6),
+            birthDate: z.string().datetime().optional(),
+            avatarUrl: z.string().url().optional(),
+            address: z
+              .object({
+                street: z.string(),
+                number: z.string(),
+                district: z.string(),
+                city: z.string(),
+                state: z.string(),
+                zipCode: z.string(),
+              })
+              .optional(),
+          })
+          .refine((data) => data.email || data.phone, {
+            message: 'É necessário fornecer email ou telefone',
+          }),
         response: {
           201: z.null(),
         },
       },
     },
     async (request, reply) => {
-      const { 
-        name, 
-        email, 
-        phone, 
-        cpf, 
+      const {
+        name,
+        email,
+        phone,
+        cpf,
         password,
         birthDate,
         avatarUrl,
-        address 
+        address,
       } = request.body
 
       if (email) {
@@ -83,16 +89,18 @@ export async function createClientAccount(app: FastifyInstance) {
           birthDate: birthDate ? new Date(birthDate) : undefined,
           avatarUrl,
           isActive: true,
-          addresses: address ? {
-            create: {
-              ...address,
-              isMain: true
-            }
-          } : undefined
+          addresses: address
+            ? {
+                create: {
+                  ...address,
+                  isMain: true,
+                },
+              }
+            : undefined,
         },
       })
 
       return reply.status(201).send()
     },
   )
-} 
+}

@@ -2,9 +2,9 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { ClientNotFoundError } from '@/errors/domain/client-errors'
 import { clientAuth } from '@/http/middlewares/client-auth'
 import { prisma } from '@/lib/prisma'
-import { ClientNotFoundError } from '@/errors/domain/client-errors'
 
 export async function getClientProfile(app: FastifyInstance) {
   app
@@ -27,15 +27,17 @@ export async function getClientProfile(app: FastifyInstance) {
                 cpf: z.string().nullable(),
                 avatarUrl: z.string().url().nullable(),
                 birthDate: z.string().datetime().nullable(),
-                addresses: z.array(z.object({
-                  id: z.string().uuid(),
-                  street: z.string(),
-                  number: z.string(),
-                  district: z.string(),
-                  city: z.string(),
-                  state: z.string(),
-                  zipCode: z.string(),
-                })),
+                addresses: z.array(
+                  z.object({
+                    id: z.string().uuid(),
+                    street: z.string(),
+                    number: z.string(),
+                    district: z.string(),
+                    city: z.string(),
+                    state: z.string(),
+                    zipCode: z.string(),
+                  }),
+                ),
               }),
             }),
           },
@@ -75,12 +77,12 @@ export async function getClientProfile(app: FastifyInstance) {
           throw new ClientNotFoundError()
         }
 
-        return reply.send({ 
+        return reply.send({
           client: {
             ...client,
             birthDate: client.birthDate?.toISOString() || null,
-          }
+          },
         })
       },
     )
-} 
+}

@@ -8,4 +8,4 @@ export const purchaseSchema = z.object({
   status: z.enum(['PENDING', 'APPROVED', 'REJECTED']),
 })
 
-export type Purchase = z.infer<typeof purchaseSchema> 
+export type Purchase = z.infer<typeof purchaseSchema>

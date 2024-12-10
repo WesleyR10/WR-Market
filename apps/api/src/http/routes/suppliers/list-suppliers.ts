@@ -21,15 +21,17 @@ export async function listSuppliers(app: FastifyInstance) {
           }),
           response: {
             200: z.object({
-              suppliers: z.array(z.object({
-                id: z.string().uuid(),
-                name: z.string(),
-                email: z.string().nullable(),
-                phone: z.string().nullable(),
-                cnpj: z.string(),
-                createdAt: z.string(),
-                updatedAt: z.string(),
-              })),
+              suppliers: z.array(
+                z.object({
+                  id: z.string().uuid(),
+                  name: z.string(),
+                  email: z.string().nullable(),
+                  phone: z.string().nullable(),
+                  cnpj: z.string(),
+                  createdAt: z.string(),
+                  updatedAt: z.string(),
+                }),
+              ),
             }),
           },
         },
@@ -59,4 +61,4 @@ export async function listSuppliers(app: FastifyInstance) {
         return reply.status(201).send()
       },
     )
-} 
+}

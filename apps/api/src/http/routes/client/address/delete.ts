@@ -1,9 +1,14 @@
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
+
+import {
+  AddressMainDeletionError,
+  AddressNotFoundError,
+  AddressUnauthorizedError,
+} from '@/errors/domain/address-errors'
 import { clientAuth } from '@/http/middlewares/client-auth'
 import { prisma } from '@/lib/prisma'
-import { AddressNotFoundError, AddressUnauthorizedError, AddressMainDeletionError } from '@/errors/domain/address-errors'
 
 export async function deleteClientAddress(app: FastifyInstance) {
   app
@@ -42,9 +47,9 @@ export async function deleteClientAddress(app: FastifyInstance) {
 
         if (address.isMain) {
           const hasOtherAddresses = await prisma.address.findFirst({
-            where: { 
+            where: {
               clientId,
-              id: { not: addressId }
+              id: { not: addressId },
             },
           })
 
@@ -54,7 +59,7 @@ export async function deleteClientAddress(app: FastifyInstance) {
 
           await prisma.address.update({
             where: { id: hasOtherAddresses.id },
-            data: { isMain: true }
+            data: { isMain: true },
           })
         }
 
@@ -63,6 +68,6 @@ export async function deleteClientAddress(app: FastifyInstance) {
         })
 
         return reply.send()
-      }
+      },
     )
-} 
+}

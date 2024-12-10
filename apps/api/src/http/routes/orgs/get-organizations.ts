@@ -12,7 +12,14 @@ interface Organization {
   slug: string
   avatarUrl: string | null
   members: {
-    role: "ADMIN" | "GERENTE_GERAL" | "GERENTE_VENDAS" | "GERENTE_ESTOQUE" | "VENDEDOR" | "ESTOQUISTA" | "ENTREGADOR"
+    role:
+      | 'ADMIN'
+      | 'GERENTE_GERAL'
+      | 'GERENTE_VENDAS'
+      | 'GERENTE_ESTOQUE'
+      | 'VENDEDOR'
+      | 'ESTOQUISTA'
+      | 'ENTREGADOR'
   }[]
 }
 

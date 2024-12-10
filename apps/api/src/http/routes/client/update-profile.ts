@@ -1,16 +1,16 @@
+import { env } from '@wr-market/env'
+import { compare, hash } from 'bcryptjs'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { env } from '@wr-market/env'
 import { z } from 'zod'
-import { hash, compare } from 'bcryptjs'
 
+import {
+  ClientNotFoundError,
+  EmailInUseError,
+  InvalidPasswordError,
+} from '@/errors/domain/client-errors'
 import { clientAuth } from '@/http/middlewares/client-auth'
 import { prisma } from '@/lib/prisma'
-import { 
-  ClientNotFoundError, 
-  EmailInUseError,
-  InvalidPasswordError 
-} from '@/errors/domain/client-errors'
 
 export async function updateClientProfile(app: FastifyInstance) {
   app
@@ -23,24 +23,33 @@ export async function updateClientProfile(app: FastifyInstance) {
           tags: ['Client'],
           summary: 'Update authenticated client profile',
           security: [{ bearerAuth: [] }],
-          body: z.object({
-            name: z.string().optional(),
-            email: z.string().email().optional(),
-            phone: z.string()
-              .regex(/^[1-9]{2}9[0-9]{8}$/, 'Formato inválido. Use: DDD + 9 + 8 dígitos (Ex: 11912345678)')
-              .optional(),
-            currentPassword: z.string().optional(),
-            newPassword: z.string().min(6).optional(),
-            birthDate: z.string().datetime().optional(),
-            avatarUrl: z.string().url().optional(),
-          }).refine(data => {
-            if (data.newPassword && !data.currentPassword) {
-              return false
-            }
-            return true
-          }, {
-            message: 'Current password is required to change password'
-          }),
+          body: z
+            .object({
+              name: z.string().optional(),
+              email: z.string().email().optional(),
+              phone: z
+                .string()
+                .regex(
+                  /^[1-9]{2}9[0-9]{8}$/,
+                  'Formato inválido. Use: DDD + 9 + 8 dígitos (Ex: 11912345678)',
+                )
+                .optional(),
+              currentPassword: z.string().optional(),
+              newPassword: z.string().min(6).optional(),
+              birthDate: z.string().datetime().optional(),
+              avatarUrl: z.string().url().optional(),
+            })
+            .refine(
+              (data) => {
+                if (data.newPassword && !data.currentPassword) {
+                  return false
+                }
+                return true
+              },
+              {
+                message: 'Current password is required to change password',
+              },
+            ),
           response: {
             200: z.null(),
           },
@@ -48,7 +57,7 @@ export async function updateClientProfile(app: FastifyInstance) {
       },
       async (request, reply) => {
         const clientId = await request.getClientId()
-        const { 
+        const {
           name,
           email,
           phone,
@@ -76,7 +85,7 @@ export async function updateClientProfile(app: FastifyInstance) {
           }
         }
 
-        let passwordHash = undefined
+        let passwordHash
         if (newPassword) {
           const isPasswordValid = await compare(
             currentPassword!,
@@ -105,4 +114,4 @@ export async function updateClientProfile(app: FastifyInstance) {
         return reply.send()
       },
     )
-} 
+}
