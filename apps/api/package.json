@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "yarn env:load tsx watch src/http/server.ts",
     "db:migrate": "yarn env:load prisma migrate dev",
+    "migrate:status": "yarn env:load prisma migrate status",
+    "migrate:reset": "prisma migrate reset --force --skip-seed",
     "db:reset": "yarn env:load prisma migrate reset",
     "db:studio": "yarn env:load prisma studio",
     "env:load": "dotenv -e ../../.env --",

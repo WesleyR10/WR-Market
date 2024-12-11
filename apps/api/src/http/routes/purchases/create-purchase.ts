@@ -79,7 +79,7 @@ export async function createPurchase(app: FastifyInstance) {
               data: {
                 total,
                 supplierId,
-                createdById: membership.id,
+                createdById: userId,
                 organizationId: membership.organizationId,
               },
             })

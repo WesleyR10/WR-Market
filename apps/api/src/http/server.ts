@@ -127,6 +127,10 @@ app.register(fastifySwagger, {
         description: 'Gerenciamento de endereços do cliente',
       },
       {
+        name: 'Categories',
+        description: 'Gestão de categorias',
+      },
+      {
         name: 'Products',
         description: 'Gestão de produtos e categorias',
       },
@@ -139,8 +143,12 @@ app.register(fastifySwagger, {
         description: 'Gestão de compras e fornecedores',
       },
       {
-        name: 'Inventory',
+        name: 'Stock',
         description: 'Controle de estoque',
+      },
+      {
+        name: 'Suppliers',
+        description: 'Gestão de fornecedores',
       },
       {
         name: 'Deliveries',
