@@ -96,9 +96,9 @@ export const LoginForm = () => {
   const onSubmit = (values: LoginFormValues) => {
     const submitValues = showTwoFactor
       ? {
-          ...values,
-          code: values.code,
-        }
+        ...values,
+        code: values.code,
+      }
       : loginMethod === 'email'
         ? { email: values.email, password: values.password }
         : { phone: values.phone, password: values.password }
@@ -181,14 +181,16 @@ export const LoginForm = () => {
               error={errors.password?.message}
             />
 
-            <Button
-              size="sm"
-              variant="link"
-              asChild
-              className="mb-3 flex justify-end px-0 font-semibold"
-            >
-              <Link href="/auth/forgot-password">Esqueci minha senha</Link>
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                size="sm"
+                variant="link"
+                asChild
+                className="mb-3 w-auto px-0 font-semibold"
+              >
+                <Link href="/auth/forgot-password">Esqueci minha senha</Link>
+              </Button>
+            </div>
           </>
         )}
 

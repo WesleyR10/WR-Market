@@ -1,6 +1,6 @@
 import { api } from './api-client'
 
-interface GetProfileResponse {
+export interface GetProfileResponse {
   user: {
     id: string
     name: string | null

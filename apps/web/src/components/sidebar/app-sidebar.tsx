@@ -28,6 +28,7 @@ import {
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { useUser } from '@/context/UserContext'
 import {
   getOrganizations,
   GetOrganizationsResponse,
@@ -165,24 +166,26 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar()
+  const { user, isLoading, isError } = useUser()
 
   const {
     data: organizationsData,
-    isLoading,
-    isError,
+    isLoading: organizationsLoading,
+    isError: organizationsError,
     error,
   } = useQuery<GetOrganizationsResponse>({
     queryKey: ['organizations'],
     queryFn: getOrganizations,
   })
 
-  if (isLoading) {
+  if (isLoading || organizationsLoading) {
     return <div>Carregando...</div>
   }
 
-  if (isError) {
+  if (isError || organizationsError) {
     return <div>Ocorreu um erro: {(error as Error).message}</div>
   }
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -193,9 +196,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
+      <SidebarFooter>{user && <NavUser user={user.user} />}</SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )
