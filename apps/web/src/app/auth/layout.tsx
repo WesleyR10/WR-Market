@@ -1,17 +1,16 @@
-// import { redirect } from 'next/navigation'
-// import { currentUser } from '@/lib/auth'
+import { redirect } from 'next/navigation'
+
+import { isAuthenticated } from '@/auth/auth'
 import { CarouselComponent } from '@/components/auth/carousel'
 
-async function AuthLayout({
+export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  // const user = await currentUser()
-  //
-  // if (user) {
-  //  redirect('/settings')
-  // }
+  if (isAuthenticated()) {
+    redirect('/')
+  }
 
   return (
     <div className="flex h-screen bg-zinc-900 max-xl:justify-center">
@@ -26,5 +25,3 @@ async function AuthLayout({
     </div>
   )
 }
-
-export default AuthLayout

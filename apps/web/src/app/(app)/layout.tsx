@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import { isAuthenticated } from '@/auth/auth'
-import { AppSidebar } from '@/components/app-sidebar'
+import { AppSidebar } from '@/components/sidebar/app-sidebar'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
 export default function AppLayout({
