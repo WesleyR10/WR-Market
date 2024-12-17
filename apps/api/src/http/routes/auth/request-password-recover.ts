@@ -44,7 +44,7 @@ export async function requestPasswordRecover(app: FastifyInstance) {
         return reply.status(201).send()
       }
 
-      const { id: code } = await prisma.token.create({
+      const code = await prisma.token.create({
         data: {
           type: 'PASSWORD_RECOVER',
           userId: user.id,
@@ -53,10 +53,10 @@ export async function requestPasswordRecover(app: FastifyInstance) {
 
       // TODO: Send recovery code based on method used
       if (email) {
-        console.log('Password recover token (email):', code)
+        console.log('Password recover token (email):', code.id)
         // Send email with recovery code
       } else if (phone) {
-        console.log('Password recover token (SMS):', code)
+        console.log('Password recover token (SMS):', code.id)
         // Send SMS with recovery code
       }
 

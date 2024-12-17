@@ -59,6 +59,7 @@ import {
   setMainClientAddress,
   shutdownOrganization,
   transferOrganization,
+  twoFactorRoutes,
   updateCategory,
   updateClientAddress,
   updateClientProfile,
@@ -207,7 +208,7 @@ app.register(createAccount)
 app.register(authenticateWithPassword)
 app.register(getProfile)
 app.register(resetPassword)
-
+app.register(twoFactorRoutes)
 // Organizations
 app.register(createOrganization)
 app.register(updateOrganization)

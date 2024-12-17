@@ -18,41 +18,56 @@ export async function resetPassword(app: FastifyInstance) {
           code: z.string(),
           password: z.string().min(6),
         }),
-        response: {
-          204: z.null(),
-        },
+        200: z.object({
+          success: z.boolean(),
+          message: z.string(),
+        }),
+        400: z.object({
+          success: z.boolean(),
+          message: z.string(),
+        }),
       },
     },
     async (request, reply) => {
       const { code, password } = request.body
 
-      const tokenFromCode = await prisma.token.findUnique({
-        where: { id: code },
+      // Buscar o token no banco de dados
+      const tokenRecord = await prisma.token.findFirst({
+        where: {
+          id: code,
+          type: 'PASSWORD_RECOVER',
+          createdAt: {
+            // Token válido por 30 minutos
+            gte: new Date(Date.now() - 30 * 60 * 1000),
+          },
+        },
+        include: {
+          user: true,
+        },
       })
 
-      if (!tokenFromCode) {
+      if (!tokenRecord) {
         throw new InvalidTokenError()
       }
 
+      // Gerar o hash da nova senha
       const passwordHash = await hash(password, env.HASH_ROUNDS)
 
+      // Atualizar a senha do usuário e remover o token em uma transação
       await prisma.$transaction([
         prisma.user.update({
-          where: {
-            id: tokenFromCode.userId,
-          },
-          data: {
-            passwordHash,
-          },
+          where: { id: tokenRecord.userId },
+          data: { passwordHash },
         }),
         prisma.token.delete({
-          where: {
-            id: code,
-          },
+          where: { id: code },
         }),
       ])
 
-      return reply.status(204).send()
+      return reply.status(200).send({
+        success: true,
+        message: 'Senha redefinida com sucesso!',
+      })
     },
   )
 }

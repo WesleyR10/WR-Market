@@ -8,9 +8,29 @@ import {
   Role,
   SaleStatus,
 } from '@prisma/client'
+import { InputJsonValue } from '@prisma/client/runtime/library'
 import { hash } from 'bcryptjs'
 
 const prisma = new PrismaClient()
+
+async function createAuditLog(
+  memberId: string,
+  action: string,
+  entity: string,
+  entityId: string,
+  changes: Record<string, unknown>,
+) {
+  await prisma.auditLog.create({
+    data: {
+      memberId,
+      action,
+      entity,
+      entityId,
+      changes: changes as unknown as InputJsonValue,
+      createdAt: new Date(),
+    },
+  })
+}
 
 async function seed() {
   // Limpar dados existentes mantendo a integridade referencial
@@ -44,6 +64,8 @@ async function seed() {
       email: 'admin@wrmarket.com',
       avatarUrl: 'https://github.com/WesleyR10',
       passwordHash,
+      isTwoFactorEnabled: false,
+      phone: '11999999999',
     },
   })
 
@@ -53,6 +75,7 @@ async function seed() {
       email: 'gerente.geral@wrmarket.com',
       avatarUrl: faker.image.avatarGitHub(),
       passwordHash,
+      isTwoFactorEnabled: true,
     },
   })
 
@@ -240,6 +263,7 @@ async function seed() {
         supplierId: supplier.id,
         organizationId: organization.id,
         createdById: gerenteVendas.id,
+        approvedById: gerenteGeral.id,
       },
     })
 
@@ -267,6 +291,7 @@ async function seed() {
       passwordHash,
       avatarUrl: faker.image.avatar(),
       birthDate: faker.date.birthdate({ min: 1960, max: 2000, mode: 'year' }),
+      isActive: true,
     })),
   })
 
@@ -297,7 +322,6 @@ async function seed() {
         source: 'ADMIN',
         clientId: client.id,
         organizationId: organization.id,
-        createdById: vendedor.id,
       },
     })
 
@@ -324,20 +348,103 @@ async function seed() {
     })
   }
 
-  // Criação de logs de auditoria
-  await prisma.auditLog.createMany({
-    data: Array.from({ length: 20 }).map(() => ({
-      memberId: allMembers[0].id,
-      action: faker.lorem.words(),
-      entity: 'Product',
-      entityId: faker.database.mongodbObjectId(),
-      changes: {
-        field: faker.lorem.word(),
-        old: faker.word.sample(),
-        new: faker.word.sample(),
+  // Log para criação de categorias
+  for (const category of allCategories) {
+    await createAuditLog(allMembers[0].id, 'CREATE', 'Category', category.id, {
+      name: category.name,
+      description: category.description,
+      organizationId: category.organizationId,
+    })
+  }
+
+  // Log para criação de produtos
+  for (const product of allProducts) {
+    await createAuditLog(allMembers[0].id, 'CREATE', 'Product', product.id, {
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      categoryId: product.categoryId,
+    })
+  }
+
+  // Log para criação de estoques
+  const allStocks = await prisma.stock.findMany()
+  for (const stock of allStocks) {
+    await createAuditLog(
+      allMembers[4].id, // estoquista
+      'CREATE',
+      'Stock',
+      stock.id,
+      {
+        quantity: stock.quantity,
+        productId: stock.productId,
       },
-    })),
-  })
+    )
+  }
+
+  // Log para criação de compras
+  const allPurchases = await prisma.purchase.findMany()
+  for (const purchase of allPurchases) {
+    await createAuditLog(
+      allMembers[2].id, // gerente de vendas
+      'CREATE',
+      'Purchase',
+      purchase.id,
+      {
+        total: purchase.total,
+        status: purchase.status,
+        supplierId: purchase.supplierId,
+      },
+    )
+  }
+
+  // Log para criação de vendas
+  const allSales = await prisma.sale.findMany()
+  for (const sale of allSales) {
+    await createAuditLog(
+      allMembers[4].id, // vendedor
+      'CREATE',
+      'Sale',
+      sale.id,
+      {
+        total: sale.total,
+        status: sale.status,
+        clientId: sale.clientId,
+        source: sale.source,
+      },
+    )
+  }
+
+  // Log para criação de entregas
+  const allDeliveries = await prisma.delivery.findMany()
+  for (const delivery of allDeliveries) {
+    await createAuditLog(
+      allMembers[6].id, // entregador
+      'CREATE',
+      'Delivery',
+      delivery.id,
+      {
+        status: delivery.status,
+        saleId: delivery.saleId,
+      },
+    )
+  }
+
+  // Log para criação de fornecedores
+  for (const supplier of allSuppliers) {
+    await createAuditLog(
+      allMembers[2].id, // gerente de vendas
+      'CREATE',
+      'Supplier',
+      supplier.id,
+      {
+        name: supplier.name,
+        email: supplier.email,
+        phone: supplier.phone,
+        cnpj: supplier.cnpj,
+      },
+    )
+  }
 
   console.log('Database seeded successfully!')
 }

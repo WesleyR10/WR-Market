@@ -19,33 +19,74 @@ enum Role {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  name         String?
-  email        String?  @unique
-  phone        String?  @unique
-  passwordHash String?  @map("password_hash")
-  avatarUrl    String?  @map("avatar_url")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id                 String   @id @default(uuid())
+  name               String?
+  email              String?  @unique
+  phone              String?  @unique
+  passwordHash       String?  @map("password_hash")
+  avatarUrl          String?  @map("avatar_url")
+  isTwoFactorEnabled Boolean  @default(false) @map("is_two_factor_enabled")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
-  tokens             Token[]
-  accounts           Account[]
-  invites            Invite[]
-  member_on          Member[]
-  owns_organizations Organization[]
-  sales              Sale[]
-  purchases          Purchase[]
-  deliveries         Delivery[]
-  purchaseApprovals  Purchase[]     @relation("PurchaseApprovals")
+  tokens                Token[]
+  accounts              Account[]
+  invites               Invite[]
+  member_on             Member[]
+  owns_organizations    Organization[]
+  sales                 Sale[]
+  purchases             Purchase[]
+  deliveries            Delivery[]
+  purchaseApprovals     Purchase[]             @relation("PurchaseApprovals")
+  twoFactorConfirmation TwoFactorConfirmation?
 
   @@index([email, phone])
   @@map("users")
+}
+
+model Client {
+  id                    String                       @id @default(uuid())
+  name                  String
+  email                 String?                      @unique
+  phone                 String?                      @unique
+  cpf                   String?                      @unique
+  passwordHash          String?                      @map("password_hash")
+  avatarUrl             String?                      @map("avatar_url")
+  birthDate             DateTime?                    @map("birth_date")
+  isActive              Boolean                      @default(true)
+  createdAt             DateTime                     @default(now()) @map("created_at")
+  updatedAt             DateTime                     @updatedAt @map("updated_at")
+  isTwoFactorEnabled    Boolean                      @default(false) @map("is_two_factor_enabled")
+  twoFactorConfirmation ClientTwoFactorConfirmation?
+
+  sales     Sale[]
+  addresses Address[]
+  tokens    ClientToken[]
+
+  @@map("clients")
+}
+
+model Address {
+  id       String  @id @default(uuid())
+  street   String
+  number   String
+  district String
+  city     String
+  state    String
+  zipCode  String  @map("zip_code")
+  isMain   Boolean @default(false) @map("is_main")
+  clientId String  @map("client_id")
+
+  client Client @relation(fields: [clientId], references: [id])
+
+  @@map("addresses")
 }
 
 enum TokenType {
   PASSWORD_RECOVER
   EMAIL_VERIFY
   PHONE_VERIFY
+  TWO_FACTOR
 }
 
 model Token {
@@ -57,6 +98,35 @@ model Token {
   userId String @map("user_id")
 
   @@map("tokens")
+}
+
+model ClientToken {
+  id        String    @id @default(uuid())
+  type      TokenType
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  clientId String @map("client_id")
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("client_tokens")
+}
+
+model TwoFactorConfirmation {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  userId    String   @unique @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("two_factor_confirmations")
+}
+
+model ClientTwoFactorConfirmation {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  clientId  String   @unique @map("client_id")
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("client_two_factor_confirmations")
 }
 
 enum AccountProvider {
@@ -194,6 +264,12 @@ enum SaleSource {
   ECOMMERCE // Vendas criadas por clientes (controladas por middleware)
 }
 
+enum SaleStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
 model Sale {
   id             String     @id @default(uuid())
   status         SaleStatus @default(PENDING)
@@ -226,6 +302,12 @@ model SaleItem {
   product Product @relation(fields: [productId], references: [id])
 
   @@map("sale_items")
+}
+
+enum PurchaseStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model Purchase {
@@ -281,52 +363,6 @@ model Supplier {
   @@map("suppliers")
 }
 
-model Client {
-  id           String    @id @default(uuid())
-  name         String
-  email        String?   @unique
-  phone        String?   @unique
-  cpf          String?   @unique
-  passwordHash String?   @map("password_hash")
-  avatarUrl    String?   @map("avatar_url")
-  birthDate    DateTime? @map("birth_date")
-  isActive     Boolean   @default(true)
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-
-  sales     Sale[]
-  addresses Address[]
-  tokens    ClientToken[]
-
-  @@map("clients")
-}
-
-model ClientToken {
-  id        String    @id @default(uuid())
-  type      TokenType
-  createdAt DateTime  @default(now()) @map("created_at")
-  clientId  String    @map("client_id")
-  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
-
-  @@map("client_tokens")
-}
-
-model Address {
-  id       String  @id @default(uuid())
-  street   String
-  number   String
-  district String
-  city     String
-  state    String
-  zipCode  String  @map("zip_code")
-  isMain   Boolean @default(false) @map("is_main")
-  clientId String  @map("client_id")
-
-  client Client @relation(fields: [clientId], references: [id])
-
-  @@map("addresses")
-}
-
 enum DeliveryStatus {
   PENDING
   IN_PROGRESS
@@ -360,16 +396,4 @@ model AuditLog {
   member Member @relation(fields: [memberId], references: [id])
 
   @@map("audit_logs")
-}
-
-enum SaleStatus {
-  PENDING
-  PAID
-  CANCELLED
-}
-
-enum PurchaseStatus {
-  PENDING
-  APPROVED
-  REJECTED
 }

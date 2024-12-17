@@ -25,6 +25,7 @@ export async function authenticateWithPassword(app: FastifyInstance) {
               )
               .optional(),
             password: z.string(),
+            code: z.string().optional(),
           })
           .refine((data) => data.email || data.phone, {
             message: 'É necessário fornecer email ou telefone',
@@ -36,11 +37,15 @@ export async function authenticateWithPassword(app: FastifyInstance) {
           201: z.object({
             token: z.string(),
           }),
+          202: z.object({
+            requiresTwoFactor: z.boolean(),
+            message: z.string(),
+          }),
         },
       },
     },
     async (request, reply) => {
-      const { email, phone, password } = request.body
+      const { email, phone, password, code } = request.body
 
       const userFromCredentials = await prisma.user.findFirst({
         where: {
@@ -65,6 +70,34 @@ export async function authenticateWithPassword(app: FastifyInstance) {
         throw new InvalidCredentialsError()
       }
 
+      // Two factor
+      if (userFromCredentials.isTwoFactorEnabled) {
+        if (!code) {
+          // Gera código de 6 dígitos
+          const twoFactorCode = Math.floor(
+            100000 + Math.random() * 900000,
+          ).toString()
+
+          // Salva o token
+          await prisma.token.create({
+            data: {
+              id: twoFactorCode,
+              type: 'TWO_FACTOR',
+              userId: userFromCredentials.id,
+            },
+          })
+
+          // TODO: Enviar código por email
+          console.log('Two factor code:', twoFactorCode)
+
+          return reply.status(202).send({
+            requiresTwoFactor: true,
+            message: 'Código de verificação enviado para seu email.',
+          })
+        }
+      }
+
+      // Gera JWT e retorna
       const token = await reply.jwtSign(
         {
           sub: userFromCredentials.id,
