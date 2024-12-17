@@ -1,5 +1,6 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import {
   AudioWaveform,
   BookOpen,
@@ -27,6 +28,10 @@ import {
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar'
+import {
+  getOrganizations,
+  GetOrganizationsResponse,
+} from '@/http/get-organizations'
 
 // This is sample data.
 const data = {
@@ -161,10 +166,27 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar()
 
+  const {
+    data: organizationsData,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<GetOrganizationsResponse>({
+    queryKey: ['organizations'],
+    queryFn: getOrganizations,
+  })
+
+  if (isLoading) {
+    return <div>Carregando...</div>
+  }
+
+  if (isError) {
+    return <div>Ocorreu um erro: {(error as Error).message}</div>
+  }
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={organizationsData?.organizations ?? []} />
       </SidebarHeader>
       <SidebarContent>
         {open && <SearchBar />}

@@ -48,10 +48,11 @@ export function NavMain({
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton
                   tooltip={item.title}
-                  className={`relative w-full group-data-[collapsible=icon]:justify-center ${item.isActive
+                  className={`relative w-full group-data-[collapsible=icon]:justify-center ${
+                    item.isActive
                       ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                       : ''
-                    }`}
+                  }`}
                 >
                   <span className="relative flex items-center gap-2">
                     {item.icon && <item.icon className="shrink-0" />}

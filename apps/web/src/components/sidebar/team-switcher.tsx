@@ -1,8 +1,10 @@
 'use client'
 
+import { Role } from '@wr-market/auth'
 import { ChevronsUpDown, Plus } from 'lucide-react'
 import * as React from 'react'
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,15 +21,19 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 
-export function TeamSwitcher({
-  teams,
-}: {
-  teams: {
-    name: string
-    logo: React.ElementType
-    plan: string
-  }[]
-}) {
+interface Team {
+  id: string
+  name: string
+  slug: string
+  avatarUrl: string | null
+  role: Role
+}
+
+interface TeamSwitcherProps {
+  teams: Team[]
+}
+
+export function TeamSwitcher({ teams }: TeamSwitcherProps) {
   const { isMobile } = useSidebar()
   const [activeTeam, setActiveTeam] = React.useState(teams[0])
 
@@ -40,14 +46,20 @@ export function TeamSwitcher({
               size="lg"
               className="w-full data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground group-data-[collapsible=icon]:justify-center"
             >
-              <div className="aspect-square flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <activeTeam.logo className="size-4" />
-              </div>
+              <Avatar className="size-8">
+                <AvatarImage
+                  src={activeTeam.avatarUrl ?? ''}
+                  alt={activeTeam.name}
+                />
+                <AvatarFallback className="bg-sidebar-primary text-sm text-sidebar-primary-foreground">
+                  {activeTeam.name.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="truncate font-semibold">
                   {activeTeam.name}
                 </span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="truncate text-xs">{activeTeam.role}</span>
               </div>
               <ChevronsUpDown className="ml-auto group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>
@@ -67,9 +79,12 @@ export function TeamSwitcher({
                 onClick={() => setActiveTeam(team)}
                 className="gap-2 p-2"
               >
-                <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <team.logo className="size-4 shrink-0" />
-                </div>
+                <Avatar className="size-6">
+                  <AvatarImage src={team.avatarUrl ?? ''} alt={team.name} />
+                  <AvatarFallback className="text-xs">
+                    {team.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 {team.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
