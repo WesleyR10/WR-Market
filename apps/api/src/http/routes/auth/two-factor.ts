@@ -6,11 +6,12 @@ import { InvalidTokenError } from '@/errors/domain/auth-errors'
 import { prisma } from '@/lib/prisma'
 
 export async function twoFactorRoutes(app: FastifyInstance) {
-  // Rota para verificar código 2FA
   app.withTypeProvider<ZodTypeProvider>().post(
     '/two-factor/verify',
     {
       schema: {
+        tags: ['Auth'],
+        summary: 'Verify 2FA code',
         body: z.object({
           code: z.string(),
         }),

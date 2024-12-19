@@ -2,8 +2,8 @@ import { defineAbilityFor } from '@wr-market/auth'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
+import { getProfile } from '@/http/auth/get-profile'
 import { getMembership } from '@/http/get-membership'
-import { getProfile } from '@/http/get-profile'
 
 export function isAuthenticated() {
   return !!cookies().get('token')?.value

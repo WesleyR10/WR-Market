@@ -26,7 +26,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { GetProfileResponse } from '@/http/get-profile'
+import { GetProfileResponse } from '@/http/auth/get-profile'
 
 export function NavUser({ user }: GetProfileResponse) {
   const { isMobile } = useSidebar()

@@ -3,7 +3,7 @@
 import { HTTPError } from 'ky'
 import * as z from 'zod'
 
-import { signUp } from '@/http/sign-up'
+import { signUp } from '@/http/auth/sign-up'
 import { RegisterSchema } from '@/schemas/auth'
 
 export const registerAction = async (

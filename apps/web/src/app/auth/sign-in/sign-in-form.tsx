@@ -96,9 +96,9 @@ export const LoginForm = () => {
   const onSubmit = (values: LoginFormValues) => {
     const submitValues = showTwoFactor
       ? {
-        ...values,
-        code: values.code,
-      }
+          ...values,
+          code: values.code,
+        }
       : loginMethod === 'email'
         ? { email: values.email, password: values.password }
         : { phone: values.phone, password: values.password }

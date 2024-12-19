@@ -62,7 +62,7 @@ async function seed() {
       id: adminId,
       name: 'Admin User',
       email: 'admin@wrmarket.com',
-      avatarUrl: 'https://github.com/WesleyR10',
+      avatarUrl: 'https://github.com/WesleyR10.png',
       passwordHash,
       isTwoFactorEnabled: false,
       phone: '11999999999',

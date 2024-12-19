@@ -65,6 +65,7 @@ import {
   updateClientProfile,
   updateOrganization,
   updateProduct,
+  updateProfile,
   updatePurchase,
   updateSale,
   updateStock,
@@ -209,6 +210,7 @@ app.register(authenticateWithPassword)
 app.register(getProfile)
 app.register(resetPassword)
 app.register(twoFactorRoutes)
+app.register(updateProfile)
 // Organizations
 app.register(createOrganization)
 app.register(updateOrganization)

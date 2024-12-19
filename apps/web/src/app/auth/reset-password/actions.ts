@@ -5,7 +5,7 @@ import * as z from 'zod'
 
 import { ResetPasswordSchema } from '@/schemas/auth'
 
-import { resetPassword } from '../../../http/reset-password'
+import { resetPassword } from '../../../http/auth/reset-password'
 
 export const resetPasswordAction = async (
   values: z.infer<typeof ResetPasswordSchema>,

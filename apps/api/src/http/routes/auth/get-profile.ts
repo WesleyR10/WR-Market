@@ -40,6 +40,7 @@ export async function getProfile(app: FastifyInstance) {
             email: true,
             phone: true,
             avatarUrl: true,
+            isTwoFactorEnabled: true,
           },
           where: {
             id: userId,

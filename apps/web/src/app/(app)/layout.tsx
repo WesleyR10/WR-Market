@@ -17,13 +17,11 @@ export default function AppLayout({
   return (
     <UserProvider>
       <SidebarProvider>
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen w-full bg-zinc-900">
           <AppSidebar />
           <main className="flex-1">
-            <div className="container">
-              <SidebarTrigger />
-              {children}
-            </div>
+            <SidebarTrigger />
+            {children}
           </main>
         </div>
       </SidebarProvider>

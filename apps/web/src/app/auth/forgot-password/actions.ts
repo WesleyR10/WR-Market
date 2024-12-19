@@ -3,7 +3,7 @@
 import { HTTPError } from 'ky'
 import * as z from 'zod'
 
-import { requestPasswordRecover } from '@/http/request-password-recover'
+import { requestPasswordRecover } from '@/http/auth/request-password-recover'
 import { ResetSchema } from '@/schemas/auth'
 
 export const forgotPasswordAction = async (

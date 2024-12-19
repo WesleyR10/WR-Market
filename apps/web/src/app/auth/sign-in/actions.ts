@@ -5,8 +5,8 @@ import { cookies } from 'next/headers'
 import * as z from 'zod'
 
 import { acceptInvite } from '@/http/accept-invite'
-import { signInWithPassword } from '@/http/sign-in-with-password'
-import { verifyTwoFactorCode } from '@/http/verify-two-factor-code'
+import { signInWithPassword } from '@/http/auth/sign-in-with-password'
+import { verifyTwoFactorCode } from '@/http/auth/verify-two-factor-code'
 import { LoginSchema } from '@/schemas/auth'
 
 export const loginActions = async (values: z.infer<typeof LoginSchema>) => {
