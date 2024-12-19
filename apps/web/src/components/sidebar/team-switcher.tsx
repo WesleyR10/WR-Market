@@ -48,18 +48,18 @@ export function TeamSwitcher({ teams }: TeamSwitcherProps) {
             >
               <Avatar className="size-8">
                 <AvatarImage
-                  src={activeTeam.avatarUrl ?? ''}
-                  alt={activeTeam.name}
+                  src={activeTeam?.avatarUrl ?? ''}
+                  alt={activeTeam?.name}
                 />
                 <AvatarFallback className="bg-sidebar-primary text-sm text-sidebar-primary-foreground">
-                  {activeTeam.name.substring(0, 2).toUpperCase()}
+                  {activeTeam?.name.substring(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                 <span className="truncate font-semibold">
-                  {activeTeam.name}
+                  {activeTeam?.name}
                 </span>
-                <span className="truncate text-xs">{activeTeam.role}</span>
+                <span className="truncate text-xs">{activeTeam?.role}</span>
               </div>
               <ChevronsUpDown className="ml-auto group-data-[collapsible=icon]:hidden" />
             </SidebarMenuButton>

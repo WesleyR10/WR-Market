@@ -1,17 +1,22 @@
 'use server'
 
-// import { env } from '@wr-market/env'
+import { env } from '@wr-market/env'
 import { redirect } from 'next/navigation'
 
-export async function signInWithGithub() {
-  const githubSignInURL = new URL('login/oauth/authorize', 'https://github.com')
+export async function signInWithGoogle() {
+  const googleSignInURL = new URL(
+    'https://accounts.google.com/o/oauth2/v2/auth',
+  )
 
-  // githubSignInURL.searchParams.set('client_id', env.GITHUB_OAUTH_CLIENT_ID)
-  // githubSignInURL.searchParams.set(
-  //   'redirect_uri',
-  //   env.GITHUB_OAUTH_CLIENT_REDIRECT_URI,
-  // )
-  // githubSignInURL.searchParams.set('scope', 'user')
+  googleSignInURL.searchParams.set('client_id', env.GOOGLE_OAUTH_CLIENT_ID)
+  googleSignInURL.searchParams.set(
+    'redirect_uri',
+    env.GOOGLE_OAUTH_REDIRECT_URI,
+  )
+  googleSignInURL.searchParams.set('response_type', 'code')
+  googleSignInURL.searchParams.set('scope', 'email profile')
+  googleSignInURL.searchParams.set('access_type', 'offline')
+  googleSignInURL.searchParams.set('prompt', 'consent')
 
-  redirect(githubSignInURL.toString())
+  redirect(googleSignInURL.toString())
 }

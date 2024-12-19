@@ -10,6 +10,8 @@ export const ErrorMessages = {
     EMAIL_IN_USE: 'Email já está em uso',
     PHONE_IN_USE: 'Telefone já está em uso',
     NO_PASSWORD: 'Usuário não possui senha cadastrada, use login social',
+    GOOGLE_AUTH_FAILED: 'Falha na autenticação com Google',
+    GOOGLE_EMAIL_REQUIRED: 'Email do Google é obrigatório para autenticação',
   },
   ORGANIZATION: {
     NOT_FOUND: 'Organização não encontrada',

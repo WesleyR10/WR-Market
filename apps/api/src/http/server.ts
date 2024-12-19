@@ -16,6 +16,7 @@ import {
 import { errorHandler } from '@/http/middlewares/error-handler'
 import {
   authenticateClient,
+  authenticateWithGoogle,
   authenticateWithPassword,
   createAccount,
   createCategory,
@@ -211,6 +212,8 @@ app.register(getProfile)
 app.register(resetPassword)
 app.register(twoFactorRoutes)
 app.register(updateProfile)
+app.register(authenticateWithGoogle)
+
 // Organizations
 app.register(createOrganization)
 app.register(updateOrganization)

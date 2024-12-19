@@ -51,3 +51,23 @@ export class NoPasswordError extends AppError {
     super(ErrorMessages.AUTH.NO_PASSWORD, HttpStatus.BAD_REQUEST, 'NO_PASSWORD')
   }
 }
+
+export class GoogleAuthFailedError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.AUTH.GOOGLE_AUTH_FAILED,
+      HttpStatus.BAD_REQUEST,
+      'GOOGLE_AUTH_FAILED',
+    )
+  }
+}
+
+export class GoogleEmailRequiredError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.AUTH.GOOGLE_EMAIL_REQUIRED,
+      HttpStatus.BAD_REQUEST,
+      'GOOGLE_EMAIL_REQUIRED',
+    )
+  }
+}

@@ -1,22 +1,12 @@
 'use client'
 
-// import { useSearchParams } from 'next/navigation'
 import { FcGoogle } from 'react-icons/fc'
 
-// import { DEFAULT_LOGIN_REDIRECT } from '@/routes'
+import { signInWithGoogle } from '@/app/auth/actions'
+
 import { BottomGradient } from './bottom-gradient'
 
 export const SocialLoginButton = () => {
-  // const searchParams = useSearchParams()
-  // const callbackUrl = searchParams.get('callbackUrl')
-
-  const onClick = (provider: string) => {
-    // signIn(provider, {
-    //     callbackUrl: callbackUrl || DEFAULT_LOGIN_REDIRECT,
-    // })
-    console.log('provider', provider)
-  }
-
   return (
     <>
       <div>
@@ -30,7 +20,7 @@ export const SocialLoginButton = () => {
             dark:shadow-[0px_0px_1px_1px_var(--emerald-200)]
             dark:hover:bg-emerald-50"
           type="button"
-          onClick={() => onClick('google')}
+          onClick={() => signInWithGoogle()}
         >
           <FcGoogle className="h-4 w-4" />
           <span className="text-sm">Google</span>

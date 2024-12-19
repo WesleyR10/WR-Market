@@ -47,7 +47,7 @@ export function NavUser({ user }: GetProfileResponse) {
                     alt={user.name ?? 'Foto do usuário'}
                   />
                 )}
-                <AvatarFallback className="rounded-lg">
+                <AvatarFallback className="rounded-lg font-semibold text-sidebar">
                   {user.name?.slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
@@ -73,7 +73,7 @@ export function NavUser({ user }: GetProfileResponse) {
                       alt={user.name ?? 'Foto do usuário'}
                     />
                   )}
-                  <AvatarFallback className="rounded-lg">
+                  <AvatarFallback className="rounded-lg font-semibold text-sidebar">
                     {user.name?.slice(0, 2)}
                   </AvatarFallback>
                 </Avatar>
