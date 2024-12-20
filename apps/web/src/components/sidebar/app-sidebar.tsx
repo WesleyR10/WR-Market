@@ -3,15 +3,18 @@
 import { useQuery } from '@tanstack/react-query'
 import {
   AudioWaveform,
-  BookOpen,
-  Bot,
+  BarChart,
   Command,
   Frame,
   GalleryVerticalEnd,
   Map,
+  Package,
   PieChart,
   Settings2,
-  SquareTerminal,
+  ShoppingBag,
+  ShoppingCart,
+  Users,
+  Users2,
 } from 'lucide-react'
 import * as React from 'react'
 
@@ -60,87 +63,137 @@ const data = {
   ],
   navMain: [
     {
-      title: 'Playground',
-      url: '#',
-      icon: SquareTerminal,
+      title: 'Dashboard',
+      url: '/dashboard',
+      icon: PieChart,
+      items: [], // Sem subitens
+    },
+    {
+      title: 'Vendas',
+      url: '/sales',
+      icon: ShoppingCart,
       items: [
         {
-          title: 'History',
-          url: '#',
+          title: 'Nova Venda',
+          url: '/sales/new',
         },
         {
-          title: 'Starred',
-          url: '#',
+          title: 'Histórico',
+          url: '/sales/history',
         },
         {
-          title: 'Settings',
-          url: '#',
+          title: 'Entregas',
+          url: '/sales/deliveries',
         },
       ],
     },
     {
-      title: 'Models',
-      url: '#',
-      icon: Bot,
+      title: 'Produtos',
+      url: '/products',
+      icon: Package,
       items: [
         {
-          title: 'Genesis',
-          url: '#',
+          title: 'Catálogo',
+          url: '/products/catalog',
         },
         {
-          title: 'Explorer',
-          url: '#',
+          title: 'Categorias',
+          url: '/products/categories',
         },
         {
-          title: 'Quantum',
-          url: '#',
+          title: 'Estoque',
+          url: '/products/stock',
         },
       ],
     },
     {
-      title: 'Documentation',
-      url: '#',
-      icon: BookOpen,
+      title: 'Compras',
+      url: '/purchases',
+      icon: ShoppingBag,
       items: [
         {
-          title: 'Introduction',
-          url: '#',
+          title: 'Nova Compra',
+          url: '/purchases/new',
         },
         {
-          title: 'Get Started',
-          url: '#',
+          title: 'Histórico',
+          url: '/purchases/history',
         },
         {
-          title: 'Tutorials',
-          url: '#',
-        },
-        {
-          title: 'Changelog',
-          url: '#',
+          title: 'Fornecedores',
+          url: '/purchases/suppliers',
         },
       ],
     },
     {
-      title: 'Settings',
-      url: '#',
+      title: 'Clientes',
+      url: '/clients',
+      icon: Users,
+      items: [
+        {
+          title: 'Lista',
+          url: '/clients/list',
+        },
+        {
+          title: 'Cadastro',
+          url: '/clients/new',
+        },
+      ],
+    },
+    {
+      title: 'Equipe',
+      url: '/team',
+      icon: Users2,
+      items: [
+        {
+          title: 'Membros',
+          url: '/team/members',
+        },
+        {
+          title: 'Convites',
+          url: '/team/invites',
+        },
+        {
+          title: 'Funções',
+          url: '/team/roles',
+        },
+      ],
+    },
+    {
+      title: 'Relatórios',
+      url: '/reports',
+      icon: BarChart,
+      items: [
+        {
+          title: 'Vendas',
+          url: '/reports/sales',
+        },
+        {
+          title: 'Estoque',
+          url: '/reports/stock',
+        },
+        {
+          title: 'Financeiro',
+          url: '/reports/financial',
+        },
+      ],
+    },
+    {
+      title: 'Configurações',
+      url: '/settings',
       icon: Settings2,
       items: [
         {
-          title: 'General',
-          url: '#',
+          title: 'Organização',
+          url: '/settings/organization',
         },
         {
-          title: 'Team',
-          url: '#',
+          title: 'Integrações',
+          url: '/settings/integrations',
         },
         {
-          title: 'Billing',
-          url: '#',
-          isActive: true,
-        },
-        {
-          title: 'Limits',
-          url: '#',
+          title: 'Auditoria',
+          url: '/settings/audit',
         },
       ],
     },
