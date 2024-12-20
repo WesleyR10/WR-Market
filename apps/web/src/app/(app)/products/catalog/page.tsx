@@ -109,8 +109,8 @@ const data: Product[] = [
     totalBuyers: 7000,
     price: 69.99,
     stock: 180,
-    status: true,
-    rating: 5,
+    status: false,
+    rating: 1,
   },
   {
     id: '#172828907',
@@ -309,8 +309,8 @@ const data: Product[] = [
 export default function CatalogPage() {
   return (
     <div className="px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Catalogo de Produtos</h1>
+      <div className="mb-6">
+        <h1 className="mb-1 text-3xl font-bold">Catalogo de Produtos</h1>
         <p className="text-muted-foreground">
           Gerencie e visualize todos os seus produtos em um único lugar
         </p>

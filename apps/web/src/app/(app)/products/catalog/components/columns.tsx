@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Switch } from '@/components/ui/switch'
 
+import { Rating } from './rating'
+
 export type Product = {
   id: string
   rank: number
@@ -145,7 +147,7 @@ export const columns: ColumnDef<Product>[] = [
     },
     cell: ({ row }) => {
       const rating = row.getValue('rating') as number
-      return <div className="text-left">{rating}</div>
+      return <Rating value={rating} />
     },
   },
   {
