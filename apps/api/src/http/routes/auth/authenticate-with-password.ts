@@ -36,6 +36,11 @@ export async function authenticateWithPassword(app: FastifyInstance) {
           }),
           201: z.object({
             token: z.string(),
+            organization: z
+              .object({
+                slug: z.string(),
+              })
+              .optional(),
           }),
           202: z.object({
             requiresTwoFactor: z.boolean(),
@@ -50,6 +55,21 @@ export async function authenticateWithPassword(app: FastifyInstance) {
       const userFromCredentials = await prisma.user.findFirst({
         where: {
           OR: [{ email: email || undefined }, { phone: phone || undefined }],
+        },
+        include: {
+          member_on: {
+            include: {
+              organization: {
+                select: {
+                  slug: true,
+                },
+              },
+            },
+            orderBy: {
+              createdAt: 'desc',
+            },
+            take: 1,
+          },
         },
       })
 
@@ -109,7 +129,12 @@ export async function authenticateWithPassword(app: FastifyInstance) {
         },
       )
 
-      return reply.status(201).send({ token })
+      const organization = userFromCredentials.member_on[0]?.organization
+
+      return reply.status(201).send({
+        token,
+        organization: organization ? { slug: organization.slug } : undefined,
+      })
     },
   )
 }

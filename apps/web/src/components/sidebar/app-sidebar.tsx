@@ -16,6 +16,7 @@ import {
   Users,
   Users2,
 } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import * as React from 'react'
 
 import { NavMain } from '@/components/sidebar/nav-main'
@@ -94,7 +95,7 @@ const data = {
       items: [
         {
           title: 'Catálogo',
-          url: '/products/catalog',
+          url: `/products/catalog`,
         },
         {
           title: 'Categorias',
@@ -220,6 +221,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar()
   const { user, isLoading, isError } = useUser()
+  const pathname = usePathname()
 
   const {
     data: organizationsData,
@@ -239,6 +241,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return <div>Ocorreu um erro: {(error as Error).message}</div>
   }
 
+  const currentSlug = pathname.split('/')[2] // Pega o slug do URL atual
+
+  // Modificar os itens de navegação para incluir o slug
+  const navItems = data.navMain.map((item) => ({
+    ...item,
+    url: `/org/${currentSlug}${item.url}`, // Adiciona o slug na URL
+    items: item.items?.map((subItem) => ({
+      ...subItem,
+      url: `/org/${currentSlug}${subItem.url}`, // Adiciona o slug também nos subitens
+    })),
+  }))
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -246,7 +260,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         {open && <SearchBar />}
-        <NavMain items={data.navMain} />
+        <NavMain items={navItems} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>{user && <NavUser user={user} />}</SidebarFooter>

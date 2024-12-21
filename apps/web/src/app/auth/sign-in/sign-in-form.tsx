@@ -82,7 +82,7 @@ export const LoginForm = () => {
           title: 'Login realizado com sucesso!',
           variant: 'success',
         })
-        router.push('/')
+        router.push(data.redirectTo || '/')
         return
       }
 

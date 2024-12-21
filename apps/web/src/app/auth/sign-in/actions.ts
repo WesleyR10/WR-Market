@@ -61,17 +61,21 @@ export const loginActions = async (values: z.infer<typeof LoginSchema>) => {
         path: '/',
         maxAge: 60 * 60 * 24 * 7,
       })
-      return { success: true }
-    }
 
-    const inviteId = cookies().get('inviteId')?.value
-
-    if (inviteId) {
-      try {
-        await acceptInvite(inviteId)
-        cookies().delete('inviteId')
-      } catch (e) {
-        console.log(e)
+      // Processa o convite primeiro, se existir
+      const inviteId = cookies().get('inviteId')?.value
+      if (inviteId) {
+        try {
+          await acceptInvite(inviteId)
+          cookies().delete('inviteId')
+        } catch (e) {
+          console.log(e)
+        }
+      }
+      // Se não tiver organização, retorna success sem redirect
+      return {
+        success: true,
+        redirectTo: `/org/${response.organization?.slug}/dashboard`,
       }
     }
   } catch (err) {

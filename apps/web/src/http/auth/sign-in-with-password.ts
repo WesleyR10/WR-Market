@@ -11,6 +11,9 @@ interface SignInWithPasswordResponse {
   token?: string
   requiresTwoFactor?: boolean
   message?: string
+  organization?: {
+    slug: string
+  }
 }
 
 export async function signInWithPassword({

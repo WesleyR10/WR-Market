@@ -6,6 +6,9 @@ interface VerifyTwoFactorCodeParams {
 
 interface VerifyTwoFactorCodeResponse {
   token: string
+  organization: {
+    slug: string
+  } | null
 }
 
 export async function verifyTwoFactorCode({ code }: VerifyTwoFactorCodeParams) {
