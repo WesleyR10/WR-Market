@@ -32,6 +32,11 @@ export async function updateSupplier(app: FastifyInstance) {
             phone: z.string().optional(),
             cnpj: z.string().length(14).optional(),
           }),
+          response: {
+            204: z.object({
+              message: z.string(),
+            }),
+          },
         },
       },
       async (request, reply) => {
@@ -41,7 +46,10 @@ export async function updateSupplier(app: FastifyInstance) {
         const { membership } = await request.getUserMembership(slug)
 
         const supplier = await prisma.supplier.findUnique({
-          where: { id: supplierId },
+          where: {
+            id: supplierId,
+            organizationId: membership.organizationId,
+          },
         })
 
         if (!supplier) {
@@ -80,7 +88,9 @@ export async function updateSupplier(app: FastifyInstance) {
           })
         })
 
-        return reply.status(204).send()
+        return reply
+          .status(204)
+          .send({ message: 'Fornecedor atualizado com sucesso' })
       },
     )
 }

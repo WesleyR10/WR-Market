@@ -41,3 +41,13 @@ export class ProductDeleteNotAllowedError extends AppError {
     )
   }
 }
+
+export class ProductHasRelationsError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.PRODUCT.HAS_RELATIONS,
+      HttpStatus.BAD_REQUEST,
+      'PRODUCT_HAS_RELATIONS',
+    )
+  }
+}

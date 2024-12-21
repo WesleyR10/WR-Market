@@ -8,6 +8,7 @@ interface Category {
   id: string
   name: string
   description: string | null
+  isActive: boolean
   createdAt: Date
   updatedAt: Date
 }
@@ -29,6 +30,7 @@ export async function listCategories(app: FastifyInstance) {
                 id: z.string().uuid(),
                 name: z.string(),
                 description: z.string().nullable(),
+                isActive: z.boolean(),
                 createdAt: z.string(),
                 updatedAt: z.string(),
               }),
@@ -48,8 +50,15 @@ export async function listCategories(app: FastifyInstance) {
         orderBy: {
           name: 'asc',
         },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       })
-
       return reply.send({
         categories: categories.map((category: Category) => ({
           ...category,

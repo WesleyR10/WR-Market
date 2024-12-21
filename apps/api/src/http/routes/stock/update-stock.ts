@@ -32,7 +32,9 @@ export async function updateStock(app: FastifyInstance) {
             productId: z.string().uuid().optional(),
           }),
           response: {
-            204: z.null(),
+            204: z.object({
+              message: z.string(),
+            }),
           },
         },
       },
@@ -80,7 +82,9 @@ export async function updateStock(app: FastifyInstance) {
           })
         })
 
-        return reply.status(204).send()
+        return reply.status(204).send({
+          message: 'Estoque atualizado com sucesso',
+        })
       },
     )
 }

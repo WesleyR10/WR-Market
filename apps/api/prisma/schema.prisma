@@ -169,13 +169,13 @@ model Member {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String       @map("organization_id")
 
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String     @map("user_id")
-  products   Product[]
-  categories Category[]
-  auditLog   AuditLog[]
-  suppliers  Supplier[]
-  stocks     Stock[]
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  auditLog AuditLog[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@unique([organizationId, userId])
   @@map("members")
@@ -211,12 +211,12 @@ model Category {
   name           String
   description    String?
   organizationId String   @map("organization_id")
-  memberId       String   @map("member_id")
+  createdById    String   @map("created_by_id")
+  isActive       Boolean  @default(true) @map("is_active")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   organization Organization @relation(fields: [organizationId], references: [id])
-  member       Member       @relation(fields: [memberId], references: [id])
   products     Product[]
 
   @@map("categories")
@@ -227,13 +227,14 @@ model Product {
   name           String
   description    String?
   price          Decimal  @db.Decimal(10, 2)
-  memberId       String   @map("member_id")
+  isActive       Boolean  @default(true) @map("is_active")
+  imageUrl       String?  @map("image_url")
   organizationId String   @map("organization_id")
   categoryId     String   @map("category_id")
+  createdById    String   @map("created_by_id")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
-  createdBy     Member         @relation(fields: [memberId], references: [id])
   organization  Organization   @relation(fields: [organizationId], references: [id])
   category      Category       @relation(fields: [categoryId], references: [id])
   stock         Stock[]
@@ -244,16 +245,16 @@ model Product {
 }
 
 model Stock {
-  id             String   @id @default(uuid())
+  id             String @id @default(uuid())
   quantity       Int
-  productId      String   @map("product_id")
-  organizationId String   @map("organization_id")
-  memberId       String   @map("member_id")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  productId      String @map("product_id")
+  organizationId String @map("organization_id")
+  createdById    String @map("created_by_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   organization Organization @relation(fields: [organizationId], references: [id])
-  member       Member       @relation(fields: [memberId], references: [id])
   Product      Product      @relation(fields: [productId], references: [id])
 
   @@map("stocks")
@@ -349,14 +350,13 @@ model Supplier {
   name           String
   email          String?
   phone          String?
-  cnpj           String?
+  cnpj           String
   organizationId String
-  createdById    String
+  createdById    String   @map("created_by_id")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
   organization Organization @relation(fields: [organizationId], references: [id])
-  createdBy    Member       @relation(fields: [createdById], references: [id])
   purchases    Purchase[]
 
   @@index([organizationId, name])

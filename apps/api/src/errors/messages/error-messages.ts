@@ -43,18 +43,22 @@ export const ErrorMessages = {
     CREATE_NOT_ALLOWED: 'Você não tem permissão para criar categorias',
     UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar esta categoria',
     DELETE_NOT_ALLOWED: 'Você não tem permissão para excluir esta categoria',
+    NOT_BELONGS_TO_ORGANIZATION: 'Categoria não pertence à esta organização',
   },
   PRODUCT: {
     NOT_FOUND: 'Produto não encontrado',
     CREATE_NOT_ALLOWED: 'Você não tem permissão para criar produtos',
     UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar este produto',
     DELETE_NOT_ALLOWED: 'Você não tem permissão para excluir este produto',
+    HAS_RELATIONS:
+      'Produto não pode ser excluído pois possui vendas ou compras associadas',
   },
   SUPPLIER: {
     NOT_FOUND: 'Fornecedor não encontrado',
     CREATE_NOT_ALLOWED: 'Você não tem permissão para criar fornecedores',
     UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar este fornecedor',
     DELETE_NOT_ALLOWED: 'Você não tem permissão para excluir este fornecedor',
+    GET_NOT_ALLOWED: 'Você não tem permissão para acessar este fornecedor',
   },
   SALE: {
     NOT_FOUND: 'Venda não encontrada',

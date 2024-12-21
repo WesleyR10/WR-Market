@@ -3,6 +3,7 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { CategoryNotBelongsToOrganizationError } from '@/errors/domain/category-errors'
 import { ProductCreateNotAllowedError } from '@/errors/domain/product-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
@@ -39,9 +40,21 @@ export async function createProduct(app: FastifyInstance) {
       },
       async (request, reply) => {
         const { slug } = request.params
+        const { categoryId } = request.body
         const userId = await request.getCurrentUserId()
         const { organization, membership } =
           await request.getUserMembership(slug)
+
+        const category = await prisma.category.findFirst({
+          where: {
+            id: categoryId,
+            organizationId: organization.id,
+          },
+        })
+
+        if (!category) {
+          throw new CategoryNotBelongsToOrganizationError()
+        }
 
         const { cannot } = getUserPermissions(userId, membership.role)
 
@@ -54,7 +67,7 @@ export async function createProduct(app: FastifyInstance) {
             const created = await tx.product.create({
               data: {
                 ...request.body,
-                memberId: membership.id,
+                createdById: membership.id,
                 organizationId: organization.id,
               },
             })

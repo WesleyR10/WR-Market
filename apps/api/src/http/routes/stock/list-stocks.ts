@@ -7,14 +7,6 @@ import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
-interface Stock {
-  id: string
-  quantity: number
-  productId: string
-  createdAt: Date
-  updatedAt: Date
-}
-
 export async function listStocks(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
@@ -41,9 +33,15 @@ export async function listStocks(app: FastifyInstance) {
                 z.object({
                   id: z.string().uuid(),
                   quantity: z.number().int(),
-                  productId: z.string().uuid(),
                   createdAt: z.string(),
                   updatedAt: z.string(),
+                  product: z.object({
+                    id: z.string().uuid(),
+                    name: z.string(),
+                    price: z.number(),
+                    imageUrl: z.string().nullable(),
+                    isActive: z.boolean(),
+                  }),
                 }),
               ),
               pagination: z.object({
@@ -82,6 +80,17 @@ export async function listStocks(app: FastifyInstance) {
               }),
               ...(productId && { productId }),
             },
+            include: {
+              Product: {
+                select: {
+                  id: true,
+                  name: true,
+                  price: true,
+                  imageUrl: true,
+                  isActive: true,
+                },
+              },
+            },
             skip: (page - 1) * perPage,
             take: perPage,
             orderBy: { createdAt: 'desc' },
@@ -101,10 +110,15 @@ export async function listStocks(app: FastifyInstance) {
         ])
 
         return reply.send({
-          stocks: stocks.map((stock: Stock) => ({
-            ...stock,
+          stocks: stocks.map((stock) => ({
+            id: stock.id,
+            quantity: stock.quantity,
             createdAt: stock.createdAt.toISOString(),
             updatedAt: stock.updatedAt.toISOString(),
+            product: {
+              ...stock.Product,
+              price: Number(stock.Product.price),
+            },
           })),
           pagination: {
             page,

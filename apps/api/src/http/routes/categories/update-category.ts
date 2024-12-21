@@ -26,6 +26,7 @@ export async function updateCategory(app: FastifyInstance) {
           body: z.object({
             name: z.string().optional(),
             description: z.string().optional(),
+            isActive: z.boolean().optional(),
           }),
           params: z.object({
             slug: z.string(),

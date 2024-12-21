@@ -44,8 +44,8 @@ export async function deleteCategory(app: FastifyInstance) {
             id: true,
             name: true,
             description: true,
-            memberId: true,
             organizationId: true,
+            createdById: true,
           },
         })
 
@@ -57,7 +57,7 @@ export async function deleteCategory(app: FastifyInstance) {
           __typename: 'Category',
           id: category.id,
           organizationId: category.organizationId,
-          memberId: category.memberId,
+          createdById: category.createdById,
         })
         const { cannot } = getUserPermissions(userId, membership.role)
 

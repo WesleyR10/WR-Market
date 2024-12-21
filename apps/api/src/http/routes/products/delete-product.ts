@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import {
   ProductDeleteNotAllowedError,
+  ProductHasRelationsError,
   ProductNotFoundError,
 } from '@/errors/domain/product-errors'
 import { auth } from '@/http/middlewares/auth'
@@ -39,12 +40,30 @@ export async function deleteProduct(app: FastifyInstance) {
           throw new ProductDeleteNotAllowedError()
         }
 
-        const product = await prisma.product.findUnique({
-          where: { id },
+        const product = await prisma.product.findFirst({
+          where: {
+            id,
+            organizationId: membership.organizationId,
+          },
+          include: {
+            _count: {
+              select: {
+                // salesItems: true, // Incluir depois
+                purchaseItems: true,
+              },
+            },
+          },
         })
 
         if (!product) {
           throw new ProductNotFoundError()
+        }
+
+        if (
+          /* product._count.salesItems > 0 || */ // Incluir depois
+          product._count.purchaseItems > 0
+        ) {
+          throw new ProductHasRelationsError()
         }
 
         await prisma.$transaction(async (tx: Prisma.TransactionClient) => {

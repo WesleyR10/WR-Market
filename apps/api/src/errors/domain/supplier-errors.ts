@@ -41,3 +41,13 @@ export class SupplierDeleteNotAllowedError extends AppError {
     )
   }
 }
+
+export class SupplierGetNotAllowedError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.SUPPLIER.GET_NOT_ALLOWED,
+      HttpStatus.FORBIDDEN,
+      'SUPPLIER_GET_NOT_ALLOWED',
+    )
+  }
+}

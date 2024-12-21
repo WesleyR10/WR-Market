@@ -30,9 +30,17 @@ export async function getStock(app: FastifyInstance) {
               stock: z.object({
                 id: z.string().uuid(),
                 quantity: z.number().int(),
-                productId: z.string().uuid(),
                 createdAt: z.string(),
                 updatedAt: z.string(),
+                product: z.object({
+                  id: z.string().uuid(),
+                  name: z.string(),
+                  description: z.string().nullable(),
+                  price: z.number(),
+                  imageUrl: z.string().nullable(),
+                  isActive: z.boolean(),
+                  categoryId: z.string().uuid(),
+                }),
               }),
             }),
           },
@@ -51,7 +59,13 @@ export async function getStock(app: FastifyInstance) {
         }
 
         const stock = await prisma.stock.findUnique({
-          where: { id: stockId },
+          where: {
+            id: stockId,
+            organizationId: membership.organizationId, // Garante que o stock pertence à organização
+          },
+          include: {
+            Product: true, // Inclui os dados do produto relacionado
+          },
         })
 
         if (!stock || stock.organizationId !== membership.organizationId) {
@@ -60,9 +74,19 @@ export async function getStock(app: FastifyInstance) {
 
         return reply.send({
           stock: {
-            ...stock,
+            id: stock.id,
+            quantity: stock.quantity,
             createdAt: stock.createdAt.toISOString(),
             updatedAt: stock.updatedAt.toISOString(),
+            product: {
+              id: stock.Product.id,
+              name: stock.Product.name,
+              description: stock.Product.description,
+              price: Number(stock.Product.price), // Convertendo Decimal para Number
+              imageUrl: stock.Product.imageUrl,
+              isActive: stock.Product.isActive,
+              categoryId: stock.Product.categoryId,
+            },
           },
         })
       },

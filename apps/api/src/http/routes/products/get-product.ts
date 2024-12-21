@@ -20,6 +20,33 @@ export async function getProduct(app: FastifyInstance) {
           params: z.object({
             id: z.string().uuid(),
           }),
+          response: {
+            200: z.object({
+              product: z.object({
+                id: z.string().uuid(),
+                name: z.string(),
+                description: z.string().nullable(),
+                price: z.number(),
+                isActive: z.boolean(),
+                imageUrl: z.string().nullable(),
+                organizationId: z.string(),
+                categoryId: z.string(),
+                createdById: z.string(),
+                createdAt: z.string(),
+                updatedAt: z.string(),
+                category: z.object({
+                  id: z.string(),
+                  name: z.string(),
+                }),
+                stock: z.array(
+                  z.object({
+                    id: z.string(),
+                    quantity: z.number(),
+                  }),
+                ),
+              }),
+            }),
+          },
         },
       },
       async (request, reply) => {
@@ -27,12 +54,28 @@ export async function getProduct(app: FastifyInstance) {
 
         const product = await prisma.product.findUnique({
           where: { id },
-          include: {
-            category: true,
-            stock: true,
-            createdBy: {
-              include: {
-                user: true,
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            price: true,
+            isActive: true,
+            imageUrl: true,
+            organizationId: true,
+            categoryId: true,
+            createdById: true,
+            createdAt: true,
+            updatedAt: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            stock: {
+              select: {
+                id: true,
+                quantity: true,
               },
             },
           },
@@ -42,7 +85,14 @@ export async function getProduct(app: FastifyInstance) {
           throw new ProductNotFoundError()
         }
 
-        return reply.send({ product })
+        return reply.send({
+          product: {
+            ...product,
+            createdAt: product.createdAt.toISOString(),
+            updatedAt: product.updatedAt.toISOString(),
+            price: Number(product.price),
+          },
+        })
       },
     )
 }

@@ -27,6 +27,7 @@ export async function getCategory(app: FastifyInstance) {
                 id: z.string().uuid(),
                 name: z.string(),
                 description: z.string().nullable(),
+                isActive: z.boolean(),
                 createdAt: z.string(),
                 updatedAt: z.string(),
               }),
@@ -41,6 +42,14 @@ export async function getCategory(app: FastifyInstance) {
 
         const category = await prisma.category.findUnique({
           where: { id: categoryId },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            isActive: true,
+            createdAt: true,
+            updatedAt: true,
+          },
         })
 
         if (!category) {

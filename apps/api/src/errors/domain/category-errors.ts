@@ -41,3 +41,13 @@ export class CategoryDeleteNotAllowedError extends AppError {
     )
   }
 }
+
+export class CategoryNotBelongsToOrganizationError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.CATEGORY.NOT_BELONGS_TO_ORGANIZATION,
+      HttpStatus.BAD_REQUEST,
+      'CATEGORY_NOT_BELONGS_TO_ORGANIZATION',
+    )
+  }
+}

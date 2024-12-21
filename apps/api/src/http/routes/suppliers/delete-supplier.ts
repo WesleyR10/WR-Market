@@ -25,6 +25,11 @@ export async function deleteSupplier(app: FastifyInstance) {
             slug: z.string(),
             supplierId: z.string().uuid(),
           }),
+          response: {
+            204: z.object({
+              message: z.string(),
+            }),
+          },
         },
       },
       async (request, reply) => {
@@ -50,7 +55,9 @@ export async function deleteSupplier(app: FastifyInstance) {
           where: { id: supplierId },
         })
 
-        return reply.status(204).send()
+        return reply.status(204).send({
+          message: 'Fornecedor deletado com sucesso',
+        })
       },
     )
 }

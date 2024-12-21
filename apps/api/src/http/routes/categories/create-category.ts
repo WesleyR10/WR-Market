@@ -38,7 +38,8 @@ export async function createCategory(app: FastifyInstance) {
         const { name, description } = request.body
 
         const userId = await request.getCurrentUserId()
-        const { membership } = await request.getUserMembership(slug)
+        const { organization, membership } =
+          await request.getUserMembership(slug)
 
         const { cannot } = getUserPermissions(userId, membership.role)
 
@@ -52,8 +53,8 @@ export async function createCategory(app: FastifyInstance) {
               data: {
                 name,
                 description,
-                organizationId: membership.organizationId,
-                memberId: membership.id,
+                organizationId: organization.id,
+                createdById: membership.id,
               },
             })
 
@@ -66,7 +67,7 @@ export async function createCategory(app: FastifyInstance) {
                 changes: {
                   name,
                   description,
-                  organizationId: membership.organizationId,
+                  organizationId: organization.id,
                 },
                 createdAt: new Date(),
               },

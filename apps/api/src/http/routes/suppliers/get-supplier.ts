@@ -2,9 +2,13 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
-import { SupplierNotFoundError } from '@/errors/domain/supplier-errors'
+import {
+  SupplierGetNotAllowedError,
+  SupplierNotFoundError,
+} from '@/errors/domain/supplier-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function getSupplier(app: FastifyInstance) {
   app
@@ -38,7 +42,14 @@ export async function getSupplier(app: FastifyInstance) {
       },
       async (request, reply) => {
         const { slug, supplierId } = request.params
-        await request.getUserMembership(slug)
+        const { membership } = await request.getUserMembership(slug)
+        const userId = await request.getCurrentUserId()
+
+        const ability = await getUserPermissions(userId, membership.role)
+
+        if (!ability.can('get', 'Supplier')) {
+          throw new SupplierGetNotAllowedError()
+        }
 
         const supplier = await prisma.supplier.findUnique({
           select: {
@@ -50,7 +61,10 @@ export async function getSupplier(app: FastifyInstance) {
             createdAt: true,
             updatedAt: true,
           },
-          where: { id: supplierId },
+          where: {
+            id: supplierId,
+            organizationId: membership.organizationId,
+          },
         })
 
         if (!supplier) {

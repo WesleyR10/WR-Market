@@ -32,6 +32,7 @@ export async function createStock(app: FastifyInstance) {
           response: {
             201: z.object({
               stockId: z.string().uuid(),
+              message: z.string(),
             }),
           },
         },
@@ -65,7 +66,7 @@ export async function createStock(app: FastifyInstance) {
                 productId,
                 quantity,
                 organizationId: membership.organizationId,
-                memberId: membership.id,
+                createdById: membership.id,
               },
             })
 
@@ -91,6 +92,7 @@ export async function createStock(app: FastifyInstance) {
 
         return reply.status(201).send({
           stockId: stock.id,
+          message: 'Estoque criado com sucesso',
         })
       },
     )

@@ -36,7 +36,9 @@ export async function updateProduct(app: FastifyInstance) {
             isActive: z.boolean().optional(),
           }),
           response: {
-            204: z.null(),
+            204: z.object({
+              message: z.string(),
+            }),
           },
         },
       },
@@ -46,7 +48,10 @@ export async function updateProduct(app: FastifyInstance) {
         const { membership } = await request.getUserMembership(slug)
 
         const product = await prisma.product.findUnique({
-          where: { id },
+          where: {
+            id,
+            organizationId: membership.organizationId,
+          },
         })
 
         if (!product) {
@@ -82,7 +87,9 @@ export async function updateProduct(app: FastifyInstance) {
           })
         })
 
-        return reply.status(204).send()
+        return reply
+          .status(204)
+          .send({ message: 'Produto atualizado com sucesso' })
       },
     )
 }
