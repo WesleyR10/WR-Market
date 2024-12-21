@@ -34,7 +34,10 @@ export const loginActions = async (values: z.infer<typeof LoginSchema>) => {
           path: '/',
           maxAge: 60 * 60 * 24 * 7,
         })
-        return { success: true }
+        return {
+          success: true,
+          redirectTo: `/org/${verifyResponse.organization?.slug}/dashboard`,
+        }
       }
     }
 

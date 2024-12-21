@@ -18,6 +18,11 @@ export async function twoFactorRoutes(app: FastifyInstance) {
         response: {
           200: z.object({
             token: z.string(),
+            organization: z
+              .object({
+                slug: z.string(),
+              })
+              .nullable(),
           }),
         },
       },
@@ -35,7 +40,17 @@ export async function twoFactorRoutes(app: FastifyInstance) {
           },
         },
         include: {
-          user: true,
+          user: {
+            include: {
+              member_on: {
+                include: {
+                  organization: {
+                    select: { slug: true },
+                  },
+                },
+              },
+            },
+          },
         },
       })
 
@@ -61,7 +76,10 @@ export async function twoFactorRoutes(app: FastifyInstance) {
         { sign: { expiresIn: '7d' } },
       )
 
-      return reply.status(200).send({ token: authToken })
+      return reply.status(200).send({
+        token: authToken,
+        organization: token.user.member_on[0].organization,
+      })
     },
   )
 }
