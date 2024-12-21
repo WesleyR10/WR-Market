@@ -129,8 +129,8 @@ async function seed() {
     },
   })
 
-  // Criação da organização
-  const organization = await prisma.organization.create({
+  // Criar primeira organização (WR Market)
+  const organizationWRMarket = await prisma.organization.create({
     data: {
       name: 'WR Market',
       slug: 'wr-market',
@@ -152,6 +152,29 @@ async function seed() {
     },
   })
 
+  // Criar segunda organização (WR Supermarket) com cargos diferentes
+  const organizationWRSupermarket = await prisma.organization.create({
+    data: {
+      name: 'WR Supermarket',
+      slug: 'wr-supermarket',
+      domain: 'wrsupermarket.com',
+      shouldAttachUsersByDomain: true,
+      avatarUrl: faker.image.avatarGitHub(),
+      ownerId: admin.id,
+      members: {
+        create: [
+          { userId: admin.id, role: Role.ADMIN },
+          { userId: gerenteGeral.id, role: Role.GERENTE_VENDAS }, // Cargo diferente
+          { userId: gerenteVendas.id, role: Role.GERENTE_ESTOQUE }, // Cargo diferente
+          { userId: gerenteEstoque.id, role: Role.GERENTE_GERAL }, // Cargo diferente
+          { userId: vendedor.id, role: Role.ESTOQUISTA }, // Cargo diferente
+          { userId: estoquista.id, role: Role.VENDEDOR }, // Cargo diferente
+          { userId: entregador.id, role: Role.ENTREGADOR },
+        ],
+      },
+    },
+  })
+
   const allMembers = await prisma.member.findMany()
   // Criação de categorias
   await prisma.category.createMany({
@@ -159,33 +182,33 @@ async function seed() {
       {
         name: 'Eletrônicos',
         description: 'Dispositivos eletrônicos',
-        organizationId: organization.id,
-        memberId: allMembers[0].id,
+        organizationId: organizationWRMarket.id,
+        createdById: allMembers[0].id,
       },
       {
         name: 'Roupas',
         description: 'Vestuário masculino e feminino',
-        organizationId: organization.id,
-        memberId: allMembers[1].id,
+        organizationId: organizationWRMarket.id,
+        createdById: allMembers[1].id,
       },
       {
         name: 'Alimentos',
         description: 'Produtos alimentícios',
-        organizationId: organization.id,
-        memberId: allMembers[2].id,
+        organizationId: organizationWRMarket.id,
+        createdById: allMembers[2].id,
       },
       {
         name: 'Casa e Jardim',
         description: 'Itens para casa e jardim',
-        organizationId: organization.id,
-        memberId: allMembers[3].id,
+        organizationId: organizationWRMarket.id,
+        createdById: allMembers[3].id,
       },
     ],
   })
 
   // Recuperar categorias criadas para relacionamentos
   const allCategories = await prisma.category.findMany({
-    where: { organizationId: organization.id },
+    where: { organizationId: organizationWRMarket.id },
   })
 
   // Criação de produtos
@@ -196,23 +219,23 @@ async function seed() {
         name: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
         price: parseFloat(faker.commerce.price()),
-        organizationId: organization.id,
+        organizationId: organizationWRMarket.id,
         categoryId: category.id,
-        memberId: allMembers[0].id,
+        createdById: allMembers[0].id,
       }
     }),
   })
 
   const allProducts = await prisma.product.findMany({
-    where: { organizationId: organization.id },
+    where: { organizationId: organizationWRMarket.id },
   })
 
   // Criação de estoques
   const stocksData = allProducts.map((product) => ({
     quantity: faker.number.int({ min: 50, max: 200 }),
     productId: product.id,
-    organizationId: organization.id,
-    memberId: allMembers[4].id,
+    organizationId: organizationWRMarket.id,
+    createdById: allMembers[4].id,
   }))
 
   await prisma.stock.createMany({
@@ -227,7 +250,7 @@ async function seed() {
         email: 'fornecedor.a@wrmarket.com',
         phone: '11222222222',
         cnpj: '12345678000199',
-        organizationId: organization.id,
+        organizationId: organizationWRMarket.id,
         createdById: allMembers[1].id,
       },
       {
@@ -235,7 +258,7 @@ async function seed() {
         email: 'fornecedor.b@wrmarket.com',
         phone: '11333333333',
         cnpj: '98765432000188',
-        organizationId: organization.id,
+        organizationId: organizationWRMarket.id,
         createdById: allMembers[1].id,
       },
       {
@@ -243,7 +266,7 @@ async function seed() {
         email: 'fornecedor.c@wrmarket.com',
         phone: '11444444444',
         cnpj: '19283746000177',
-        organizationId: organization.id,
+        organizationId: organizationWRMarket.id,
         createdById: allMembers[1].id,
       },
     ],
@@ -251,7 +274,7 @@ async function seed() {
 
   // Recuperar fornecedores criados
   const allSuppliers = await prisma.supplier.findMany({
-    where: { organizationId: organization.id },
+    where: { organizationId: organizationWRMarket.id },
   })
 
   // Criação de compras
@@ -261,7 +284,7 @@ async function seed() {
         total: faker.number.float({ min: 1000, max: 10000, fractionDigits: 2 }),
         status: faker.helpers.arrayElement(Object.values(PurchaseStatus)),
         supplierId: supplier.id,
-        organizationId: organization.id,
+        organizationId: organizationWRMarket.id,
         createdById: gerenteVendas.id,
         approvedById: gerenteGeral.id,
       },
@@ -321,7 +344,7 @@ async function seed() {
         status: faker.helpers.arrayElement(Object.values(SaleStatus)),
         source: 'ADMIN',
         clientId: client.id,
-        organizationId: organization.id,
+        organizationId: organizationWRMarket.id,
       },
     })
 
@@ -342,6 +365,225 @@ async function seed() {
     await prisma.delivery.create({
       data: {
         status: faker.helpers.arrayElement(Object.values(DeliveryStatus)),
+        saleId: sale.id,
+        deliveryManId: entregador.id,
+      },
+    })
+  }
+
+  // Criar categorias para WR Supermarket
+  const supermarketCategories = await Promise.all([
+    prisma.category.create({
+      data: {
+        name: 'Mercearia',
+        description: 'Produtos de mercearia em geral',
+        organizationId: organizationWRSupermarket.id,
+        createdById: admin.id,
+      },
+    }),
+    prisma.category.create({
+      data: {
+        name: 'Hortifruti',
+        description: 'Frutas, legumes e verduras',
+        organizationId: organizationWRSupermarket.id,
+        createdById: admin.id,
+      },
+    }),
+    prisma.category.create({
+      data: {
+        name: 'Bebidas',
+        description: 'Bebidas em geral',
+        organizationId: organizationWRSupermarket.id,
+        createdById: admin.id,
+      },
+    }),
+  ])
+
+  // Criar produtos para WR Supermarket
+  const supermarketProducts = await Promise.all(
+    supermarketCategories.flatMap((category) =>
+      Array.from({ length: 5 }, async () => {
+        return prisma.product.create({
+          data: {
+            name: faker.commerce.productName(),
+            description: faker.commerce.productDescription(),
+            price: faker.number.float({ min: 1, max: 1000, fractionDigits: 2 }),
+            imageUrl: faker.image.url(),
+            isActive: faker.datatype.boolean(), // Campo isActive aleatório
+            organizationId: organizationWRSupermarket.id,
+            categoryId: category.id,
+            createdById: admin.id,
+          },
+        })
+      }),
+    ),
+  )
+
+  const existingProducts = await prisma.product.findMany({
+    where: {
+      organizationId: organizationWRMarket.id,
+    },
+  })
+
+  await Promise.all(
+    existingProducts.map((product) =>
+      prisma.product.update({
+        where: { id: product.id },
+        data: {
+          isActive: faker.datatype.boolean(),
+        },
+      }),
+    ),
+  )
+
+  // Criar fornecedores para WR Supermarket
+  const supermarketSuppliers = await Promise.all([
+    prisma.supplier.create({
+      data: {
+        name: 'Fornecedor de Hortifruti',
+        email: 'hortifruti@fornecedor.com',
+        phone: '11999999991',
+        cnpj: '12345678901234',
+        organizationId: organizationWRSupermarket.id,
+        createdById: admin.id,
+      },
+    }),
+    prisma.supplier.create({
+      data: {
+        name: 'Fornecedor de Bebidas',
+        email: 'bebidas@fornecedor.com',
+        phone: '11999999992',
+        cnpj: '12345678901235',
+        organizationId: organizationWRSupermarket.id,
+        createdById: admin.id,
+      },
+    }),
+  ])
+
+  // Criar clientes para WR Supermarket
+  const supermarketClients = await Promise.all([
+    prisma.client.create({
+      data: {
+        name: 'Cliente Supermarket 1',
+        email: 'cliente1@supermarket.com',
+        phone: '11999999993',
+        cpf: '12345678901',
+        isActive: true,
+        addresses: {
+          create: {
+            street: 'Rua do Supermarket',
+            number: '123',
+            district: 'Centro',
+            city: 'São Paulo',
+            state: 'SP',
+            zipCode: '01234567',
+            isMain: true,
+          },
+        },
+      },
+    }),
+    prisma.client.create({
+      data: {
+        name: 'Cliente Supermarket 2',
+        email: 'cliente2@supermarket.com',
+        phone: '11999999994',
+        cpf: '12345678902',
+        isActive: true,
+        addresses: {
+          create: {
+            street: 'Avenida do Supermarket',
+            number: '456',
+            district: 'Jardins',
+            city: 'São Paulo',
+            state: 'SP',
+            zipCode: '01234568',
+            isMain: true,
+          },
+        },
+      },
+    }),
+  ])
+
+  // Criar estoque para produtos do WR Supermarket
+  await Promise.all(
+    supermarketProducts.map((product) =>
+      prisma.stock.create({
+        data: {
+          quantity: faker.number.int({ min: 10, max: 100 }),
+          productId: product.id,
+          organizationId: organizationWRSupermarket.id,
+          createdById: admin.id,
+        },
+      }),
+    ),
+  )
+
+  // Criar compras para WR Supermarket
+  for (const supplier of supermarketSuppliers) {
+    const purchase = await prisma.purchase.create({
+      data: {
+        total: faker.number.float({ min: 1000, max: 5000, fractionDigits: 2 }),
+        status: faker.helpers.arrayElement(Object.values(PurchaseStatus)),
+        supplierId: supplier.id,
+        organizationId: organizationWRSupermarket.id,
+        createdById: admin.id,
+        approvedById: admin.id,
+      },
+    })
+
+    // Criar itens para cada compra
+    const randomProducts = faker.helpers.arrayElements(supermarketProducts, 3)
+    await Promise.all(
+      randomProducts.map((product) =>
+        prisma.purchaseItem.create({
+          data: {
+            quantity: faker.number.int({ min: 5, max: 20 }),
+            price: product.price,
+            purchaseId: purchase.id,
+            productId: product.id,
+          },
+        }),
+      ),
+    )
+  }
+
+  // Criar vendas para WR Supermarket
+  for (const client of supermarketClients) {
+    const sale = await prisma.sale.create({
+      data: {
+        total: faker.number.float({ min: 100, max: 5000, fractionDigits: 2 }),
+        status: faker.helpers.arrayElement(Object.values(SaleStatus)),
+        source: faker.helpers.arrayElement(['ADMIN', 'ECOMMERCE']),
+        clientId: client.id,
+        organizationId: organizationWRSupermarket.id,
+        createdById: admin.id,
+      },
+    })
+
+    // Criar itens para cada venda
+    const randomProducts = faker.helpers.arrayElements(supermarketProducts, 2)
+    await Promise.all(
+      randomProducts.map((product) =>
+        prisma.saleItem.create({
+          data: {
+            quantity: faker.number.int({ min: 1, max: 5 }),
+            price: product.price,
+            saleId: sale.id,
+            productId: product.id,
+          },
+        }),
+      ),
+    )
+
+    // Criar entrega para a venda
+    await prisma.delivery.create({
+      data: {
+        status: faker.helpers.arrayElement([
+          'PENDING',
+          'IN_PROGRESS',
+          'DELIVERED',
+          'CANCELLED',
+        ]),
         saleId: sale.id,
         deliveryManId: entregador.id,
       },
