@@ -4,9 +4,9 @@ import { HTTPError } from 'ky'
 import { cookies } from 'next/headers'
 import * as z from 'zod'
 
-import { acceptInvite } from '@/http/accept-invite'
 import { signInWithPassword } from '@/http/auth/sign-in-with-password'
 import { verifyTwoFactorCode } from '@/http/auth/verify-two-factor-code'
+import { acceptInvite } from '@/http/invite/accept-invite'
 import { LoginSchema } from '@/schemas/auth'
 
 export const loginActions = async (values: z.infer<typeof LoginSchema>) => {

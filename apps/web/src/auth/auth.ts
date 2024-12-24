@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { getProfile } from '@/http/auth/get-profile'
-import { getMembership } from '@/http/get-membership'
+import { getMembership } from '@/http/org/get-membership'
 
 export function isAuthenticated() {
   return !!cookies().get('token')?.value
@@ -33,12 +33,9 @@ export async function ability() {
   }
 
   const ability = defineAbilityFor({
+    __typename: 'User',
     id: membership.userId,
     role: membership.role,
-    membership: {
-      id: membership.id,
-      role: membership.role,
-    },
   })
 
   return ability

@@ -42,7 +42,7 @@ export function middleware(request: NextRequest) {
     response.cookies.delete('org')
   }
 
-  return NextResponse.next()
+  return response
 }
 
 export const config = {

@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
-import { acceptInvite } from '@/http/accept-invite'
+import { acceptInvite } from '@/http/org/accept-invite'
 import { signInWithGoogle } from '@/http/sign-in-with-google'
 
 export async function GET(request: NextRequest) {
@@ -35,7 +35,6 @@ export async function GET(request: NextRequest) {
   }
 
   const redirectUrl = request.nextUrl.clone() // Clono a URL atual "https://localhost:3000/api/auth/callback?code=..."
-  console.log('redirectUrl', redirectUrl)
 
   redirectUrl.pathname = '/'
   redirectUrl.search = ''

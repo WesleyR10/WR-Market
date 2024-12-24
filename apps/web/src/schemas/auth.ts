@@ -91,7 +91,6 @@ export const LoginSchema = z
         path: ['email'],
       })
     }
-    console.log('Schema validation data:', data)
   })
 
 export const RegisterSchema = z

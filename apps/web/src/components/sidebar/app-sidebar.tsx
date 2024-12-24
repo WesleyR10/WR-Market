@@ -36,7 +36,7 @@ import { useUser } from '@/context/UserContext'
 import {
   getOrganizations,
   GetOrganizationsResponse,
-} from '@/http/get-organizations'
+} from '@/http/org/get-organizations'
 
 // This is sample data.
 const data = {

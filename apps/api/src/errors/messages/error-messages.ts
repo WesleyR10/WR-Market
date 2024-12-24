@@ -81,4 +81,12 @@ export const ErrorMessages = {
     DELETE_NOT_ALLOWED: 'Você não tem permissão para deletar esta compra',
     GET_NOT_ALLOWED: 'Você não tem permissão para acessar esta compra',
   },
+  MEMBER: {
+    NOT_FOUND: 'Membro não encontrado',
+    GET_NOT_ALLOWED: 'Você não tem permissão para visualizar membros',
+    CREATE_NOT_ALLOWED: 'Você não tem permissão para adicionar membros',
+    UPDATE_NOT_ALLOWED: 'Você não tem permissão para atualizar este membro',
+    DELETE_NOT_ALLOWED: 'Você não tem permissão para remover este membro',
+    EMAIL_REQUIRED: 'Email do membro é obrigatório',
+  },
 } as const

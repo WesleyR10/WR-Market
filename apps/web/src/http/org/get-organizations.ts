@@ -1,6 +1,6 @@
 import { Role } from '@wr-market/auth'
 
-import { api } from './api-client'
+import { api } from '../api-client'
 
 interface Organization {
   id: string

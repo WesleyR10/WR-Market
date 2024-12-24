@@ -37,6 +37,7 @@ import {
   deleteSupplier,
   getCategory,
   getClientProfile,
+  getMembers,
   getMembership,
   getOrganization,
   getOrganizations,
@@ -120,6 +121,10 @@ app.register(fastifySwagger, {
       {
         name: 'Organizations',
         description: 'Gestão de organizações/filiais',
+      },
+      {
+        name: 'Members',
+        description: 'Gestão de membros da organização',
       },
       {
         name: 'Client',
@@ -226,6 +231,9 @@ app.register(getOrganization)
 app.register(getMembership)
 app.register(shutdownOrganization)
 app.register(transferOrganization)
+
+// Members
+app.register(getMembers)
 
 // Client
 app.register(resetClientPassword)
