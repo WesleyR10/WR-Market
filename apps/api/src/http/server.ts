@@ -54,6 +54,8 @@ import {
   listSales,
   listStocks,
   listSuppliers,
+  removeMember,
+  removeMembers,
   requestClientPasswordRecover,
   requestPasswordRecover,
   resetClientPassword,
@@ -65,6 +67,7 @@ import {
   updateCategory,
   updateClientAddress,
   updateClientProfile,
+  updateMember,
   updateOrganization,
   updateProduct,
   updateProfile,
@@ -234,7 +237,9 @@ app.register(transferOrganization)
 
 // Members
 app.register(getMembers)
-
+app.register(updateMember)
+app.register(removeMember)
+app.register(removeMembers)
 // Client
 app.register(resetClientPassword)
 app.register(requestPasswordRecover)

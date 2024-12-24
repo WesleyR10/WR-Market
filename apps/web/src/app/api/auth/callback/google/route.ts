@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
-import { acceptInvite } from '@/http/org/accept-invite'
-import { signInWithGoogle } from '@/http/sign-in-with-google'
+import { signInWithGoogle } from '@/http/auth/sign-in-with-google'
+import { acceptInvite } from '@/http/invite/accept-invite'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
