@@ -5,25 +5,10 @@ import { Plus, Trash } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { convertStatus, MemberStatus } from '@/lib/utils'
 
 import { columns } from './columns'
 import { DataTable } from './data-table'
-
-export enum MemberStatus {
-  ACTIVE = 'Ativo',
-  INACTIVE = 'Inativo',
-}
-// Tipo para mapear os status da API para os status da UI
-export type APIStatus = 'ACTIVE' | 'INACTIVE'
-
-// Função de conversão atualizada
-function convertStatus(apiStatus: APIStatus): MemberStatus {
-  const statusMap: Record<APIStatus, MemberStatus> = {
-    ACTIVE: MemberStatus.ACTIVE,
-    INACTIVE: MemberStatus.INACTIVE,
-  }
-  return statusMap[apiStatus]
-}
 
 // Interface para o membro como vem da API
 export interface MemberFromAPI {

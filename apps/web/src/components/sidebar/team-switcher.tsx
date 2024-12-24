@@ -1,7 +1,9 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { Role } from '@wr-market/auth'
 import { ChevronsUpDown, Plus } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
 import * as React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -11,7 +13,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -20,6 +21,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { getRoleLabel } from '@/lib/utils'
 
 interface Team {
   id: string
@@ -35,7 +37,20 @@ interface TeamSwitcherProps {
 
 export function TeamSwitcher({ teams }: TeamSwitcherProps) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
+  const pathname = usePathname()
+  const queryClient = useQueryClient()
+
   const [activeTeam, setActiveTeam] = React.useState(teams[0])
+
+  const handleTeamChange = (team: Team) => {
+    setActiveTeam(team)
+    // Pega o path atual após o slug da organização
+    queryClient.invalidateQueries({ queryKey: ['userProfile'] })
+
+    const currentPath = pathname.split('/').slice(3).join('/')
+    router.push(`/org/${team.slug}/${currentPath}`)
+  }
 
   return (
     <SidebarMenu>
@@ -73,11 +88,11 @@ export function TeamSwitcher({ teams }: TeamSwitcherProps) {
             <DropdownMenuLabel className="text-xs text-muted-foreground">
               Teams
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {teams.map((team) => (
               <DropdownMenuItem
                 key={team.name}
-                onClick={() => setActiveTeam(team)}
-                className="gap-2 p-2"
+                onClick={() => handleTeamChange(team)}
+                className="cursor-pointer gap-2 p-2"
               >
                 <Avatar className="size-6">
                   <AvatarImage src={team.avatarUrl ?? ''} alt={team.name} />
@@ -85,8 +100,12 @@ export function TeamSwitcher({ teams }: TeamSwitcherProps) {
                     {team.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                <span>
+                  {team.name}{' '}
+                  <span className="text-muted-foreground">
+                    ({getRoleLabel(team.role)})
+                  </span>
+                </span>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
