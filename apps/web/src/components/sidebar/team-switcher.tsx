@@ -5,6 +5,7 @@ import { Role } from '@wr-market/auth'
 import { ChevronsUpDown, Plus } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import * as React from 'react'
+import { useEffect } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -39,9 +40,18 @@ export function TeamSwitcher({ teams }: TeamSwitcherProps) {
   const { isMobile } = useSidebar()
   const router = useRouter()
   const pathname = usePathname()
+  const currentSlug = pathname.split('/')[2] // Pega o slug do URL atual
   const queryClient = useQueryClient()
 
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const [activeTeam, setActiveTeam] = React.useState<Team | null>(null)
+
+  useEffect(() => {
+    const matchingTeam = teams.find((team) => team.slug === currentSlug)
+
+    if (matchingTeam && (!activeTeam || activeTeam.slug !== currentSlug)) {
+      setActiveTeam(matchingTeam)
+    }
+  }, [currentSlug, teams, activeTeam])
 
   const handleTeamChange = (team: Team) => {
     setActiveTeam(team)

@@ -5,7 +5,7 @@ import { Plus, Trash } from 'lucide-react'
 import { useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { convertStatus, MemberStatus } from '@/lib/utils'
+import { APIStatus } from '@/lib/utils'
 
 import { columns } from './columns'
 import { DataTable } from './data-table'
@@ -22,15 +22,14 @@ export interface MemberFromAPI {
   avatarUrl: string | null
 }
 
-// Interface para exibição na tabela (sem nullables)
 export interface TableMember {
   id: string
-  photo: string // Vamos usar um fallback para null
-  name: string // Vamos usar um fallback para null
+  photo: string
+  name: string
   email: string
-  phone: string // Vamos usar um fallback
+  phone: string
   role: Role
-  status: MemberStatus
+  status: APIStatus
   joinedDate: string
 }
 
@@ -62,7 +61,7 @@ export function MembersTable({ data }: MembersTableProps) {
         email: member.email,
         phone: member.phone || 'Não informado', // Fallback
         role: member.role,
-        status: convertStatus(member.status), // Convertendo o status aqui
+        status: member.status,
         joinedDate: new Date().toLocaleDateString('pt-BR', {
           day: '2-digit',
           month: 'long',
