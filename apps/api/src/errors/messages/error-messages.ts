@@ -89,4 +89,7 @@ export const ErrorMessages = {
     DELETE_NOT_ALLOWED: 'Você não tem permissão para remover este membro',
     EMAIL_REQUIRED: 'Email do membro é obrigatório',
   },
+  ROLE: {
+    HIERARCHY_ERROR: 'Você não tem permissão para gerenciar este cargo',
+  },
 } as const

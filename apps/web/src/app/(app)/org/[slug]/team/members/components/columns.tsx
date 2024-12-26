@@ -1,15 +1,19 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
+import { Role } from '@wr-market/auth'
 import { ArrowUpDown, Crown, SortAsc } from 'lucide-react'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useUser } from '@/context/UserContext'
 import { APIStatus } from '@/lib/utils'
+import { canManageRole, getAssignableRoles } from '@/utils/role-hierarchy'
 
+import { TableMember } from './MembersTable'
 import { RoleSelect } from './role-select'
 import { StatusSwitch } from './status-switch'
 
@@ -24,7 +28,7 @@ export type Member = {
   joinedDate: string
 }
 
-export const columns: ColumnDef<Member>[] = [
+export const columns = (currentUserRole: Role): ColumnDef<TableMember>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -119,6 +123,15 @@ export const columns: ColumnDef<Member>[] = [
     header: 'Função',
     cell: ({ row }) => {
       const params = useParams()
+      const assignableRoles = getAssignableRoles(
+        currentUserRole,
+        row.original.role,
+      )
+
+      // Se não há roles para atribuir, mostra apenas um badge
+      if (assignableRoles.length === 0) {
+        return <Badge>{row.original.role}</Badge>
+      }
 
       return (
         <RoleSelect
@@ -126,6 +139,7 @@ export const columns: ColumnDef<Member>[] = [
           orgSlug={params.slug as string}
           memberId={row.original.id}
           userName={row.getValue('name')}
+          assignableRoles={assignableRoles}
         />
       )
     },
@@ -136,6 +150,11 @@ export const columns: ColumnDef<Member>[] = [
     cell: ({ row }) => {
       const params = useParams()
       const status = row.getValue('status') as APIStatus
+      const canManage = canManageRole(currentUserRole, row.original.role)
+
+      if (!canManage) {
+        return <Badge>{row.original.status}</Badge>
+      }
 
       return (
         <StatusSwitch

@@ -76,6 +76,8 @@ export const permissions: Record<Role, PermissionsByRole> = {
     can('get', 'Product')
     can('get', 'Category')
     can(['get', 'create', 'update'], 'Client')
+    can('get', 'Delivery')
+    can('get', 'User')
 
     // Vendedor só pode atualizar vendas que ele criou
     cannot('update', 'Sale')
@@ -88,6 +90,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
     can(['get', 'update'], 'Product')
     can('get', 'Category')
     can('manage', 'Stock')
+    can('get', 'User')
 
     // Estoquista pode ver e criar pedidos de compra (mas não pode aprovar)
     can(['get', 'create'], 'Purchase') // Cria requisições de compra

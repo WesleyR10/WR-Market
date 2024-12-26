@@ -39,6 +39,7 @@ interface RoleSelectProps {
   orgSlug: string
   memberId: string
   userName: string // Adicionando nome do usuário para o dialog
+  assignableRoles: Role[]
   disabled?: boolean
 }
 
@@ -47,6 +48,7 @@ export function RoleSelect({
   orgSlug,
   memberId,
   userName,
+  assignableRoles,
   disabled,
 }: RoleSelectProps) {
   const [isLoading, setIsLoading] = useState(false)
@@ -55,7 +57,13 @@ export function RoleSelect({
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
+  // Encontra o label da role atual
   const currentRole = roles.find((role) => role.value === value)
+
+  // Filtra apenas as roles que podem ser atribuídas
+  const availableRoles = roles.filter((role) =>
+    assignableRoles.includes(role.value),
+  )
 
   const { mutate: updateRole } = useMutation({
     mutationFn: async (newRole: Role) => {
@@ -111,7 +119,7 @@ export function RoleSelect({
           <SelectValue>{currentRole?.label || 'Selecionar função'}</SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {roles.map((role) => (
+          {availableRoles.map((role) => (
             <SelectItem key={role.value} value={role.value}>
               {role.label}
             </SelectItem>

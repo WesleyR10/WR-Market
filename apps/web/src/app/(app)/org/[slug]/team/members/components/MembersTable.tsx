@@ -70,7 +70,10 @@ export function MembersTable({ data }: MembersTableProps) {
       }),
     )
   }, [data])
-  const memoizedColumns = useMemo(() => columns, [])
+  const memoizedColumns = useMemo(
+    () => columns(data.membership.role), // Passa a role do usuário atual
+    [data.membership.role],
+  )
 
   return (
     <div className="px-4">
