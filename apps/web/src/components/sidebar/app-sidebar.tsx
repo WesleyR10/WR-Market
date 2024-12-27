@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import {
   AudioWaveform,
   BarChart,
+  ClipboardList,
   Command,
   Frame,
   GalleryVerticalEnd,
@@ -85,6 +86,21 @@ const data = {
         {
           title: 'Entregas',
           url: '/sales/deliveries',
+        },
+      ],
+    },
+    {
+      title: 'Pedidos',
+      url: '/orders',
+      icon: ClipboardList,
+      items: [
+        {
+          title: 'Dashboard',
+          url: '/orders/dashboard',
+        },
+        {
+          title: 'Histórico',
+          url: '/orders/history',
         },
       ],
     },
