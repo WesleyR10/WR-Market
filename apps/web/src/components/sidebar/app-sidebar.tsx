@@ -37,7 +37,7 @@ import { useUser } from '@/context/UserContext'
 import {
   getOrganizations,
   GetOrganizationsResponse,
-} from '@/http/org/get-organizations'
+} from '@/http/org/list-organizations'
 
 // This is sample data.
 const data = {
@@ -109,6 +109,10 @@ const data = {
       url: '/products',
       icon: Package,
       items: [
+        {
+          title: 'Novo Produto',
+          url: '/products/new',
+        },
         {
           title: 'Catálogo',
           url: `/products/catalog`,

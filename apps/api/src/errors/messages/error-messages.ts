@@ -52,6 +52,10 @@ export const ErrorMessages = {
     DELETE_NOT_ALLOWED: 'Você não tem permissão para excluir este produto',
     HAS_RELATIONS:
       'Produto não pode ser excluído pois possui vendas ou compras associadas',
+    IMAGE_UPLOAD_NOT_ALLOWED:
+      'Você não tem permissão para fazer upload de imagens para este produto',
+    IMAGE_DELETE_NOT_ALLOWED:
+      'Você não tem permissão para deletar imagens deste produto',
   },
   SUPPLIER: {
     NOT_FOUND: 'Fornecedor não encontrado',
@@ -91,5 +95,9 @@ export const ErrorMessages = {
   },
   ROLE: {
     HIERARCHY_ERROR: 'Você não tem permissão para gerenciar este cargo',
+  },
+  UPLOAD: {
+    INVALID_FILE_TYPE: 'Tipo de arquivo inválido',
+    FILE_TOO_LARGE: 'Arquivo muito grande',
   },
 } as const

@@ -39,12 +39,15 @@ export const LoginForm = () => {
     resolver: async (data, context, options) => {
       if (loginMethod === 'email') {
         const { phone, ...rest } = data
+        // @ts-expect-error - O tipo ZodEffects é compatível, mas o TypeScript não reconhece
         return zodResolver(LoginSchema)(rest, context, options)
       }
       if (loginMethod === 'phone') {
         const { email, ...rest } = data
+        // @ts-expect-error - O tipo ZodEffects é compatível, mas o TypeScript não reconhece
         return zodResolver(LoginSchema)(rest, context, options)
       }
+      // @ts-expect-error - O tipo ZodEffects é compatível, mas o TypeScript não reconhece
       return zodResolver(LoginSchema)(data, context, options)
     },
     defaultValues: {

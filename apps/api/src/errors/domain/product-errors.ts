@@ -51,3 +51,23 @@ export class ProductHasRelationsError extends AppError {
     )
   }
 }
+
+export class ProductImageUploadNotAllowedError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.PRODUCT.IMAGE_UPLOAD_NOT_ALLOWED,
+      HttpStatus.FORBIDDEN,
+      'PRODUCT_IMAGE_UPLOAD_NOT_ALLOWED',
+    )
+  }
+}
+
+export class ProductImageDeleteNotAllowedError extends AppError {
+  constructor() {
+    super(
+      ErrorMessages.PRODUCT.IMAGE_DELETE_NOT_ALLOWED,
+      HttpStatus.FORBIDDEN,
+      'PRODUCT_IMAGE_DELETE_NOT_ALLOWED',
+    )
+  }
+}

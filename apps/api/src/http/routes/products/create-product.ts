@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -24,12 +23,24 @@ export async function createProduct(app: FastifyInstance) {
             slug: z.string(),
           }),
           body: z.object({
+            categoryId: z.string().uuid(),
+            sku: z.string().optional(),
+            barcode: z.string().optional(),
+            brand: z.string().optional(),
+            unit: z.string().optional(),
+            weight: z.number().optional(),
+            costPrice: z.number().optional(),
+            minStock: z.number().optional(),
+            maxStock: z.number().optional(),
+            images: z.array(z.string().url()),
             name: z.string(),
             description: z.string(),
             price: z.number().positive(),
-            categoryId: z.string().uuid(),
-            imageUrl: z.string().url().optional(),
             isActive: z.boolean().default(true),
+            stockQuantity: z
+              .number()
+              .int()
+              .min(0, 'Quantidade não pode ser negativa'),
           }),
           response: {
             201: z.object({
@@ -62,35 +73,60 @@ export async function createProduct(app: FastifyInstance) {
           throw new ProductCreateNotAllowedError()
         }
 
-        const product = await prisma.$transaction(
-          async (tx: Prisma.TransactionClient) => {
-            const created = await tx.product.create({
+        // Usar transação para garantir atomicidade
+        const result = await prisma.$transaction(async (tx) => {
+          const product = await tx.product.create({
+            data: {
+              name: request.body.name,
+              description: request.body.description,
+              price: request.body.price,
+              costPrice: request.body.costPrice,
+              categoryId: request.body.categoryId,
+              images: request.body.images, // URLs já existentes no R2
+              sku: request.body.sku,
+              barcode: request.body.barcode,
+              brand: request.body.brand,
+              weight: request.body.weight,
+              unit: request.body.unit,
+              minStock: request.body.minStock,
+              maxStock: request.body.maxStock,
+              isActive: request.body.isActive,
+              createdById: membership.id,
+              organizationId: organization.id,
+            },
+          })
+
+          // Criar o log de auditoria
+          await tx.auditLog.create({
+            data: {
+              memberId: membership.id,
+              action: 'CREATE',
+              entity: 'Product',
+              entityId: product.id,
+              changes: {
+                old: null,
+                new: product,
+              },
+              createdAt: new Date(),
+            },
+          })
+
+          // Se houver quantidade de estoque, criar o registro de estoque
+          if (request.body.stockQuantity > 0) {
+            await tx.stock.create({
               data: {
-                ...request.body,
-                createdById: membership.id,
+                quantity: request.body.stockQuantity,
+                productId: product.id,
                 organizationId: organization.id,
+                createdById: membership.id,
               },
             })
+          }
 
-            await tx.auditLog.create({
-              data: {
-                memberId: membership.id,
-                action: 'CREATE',
-                entity: 'Product',
-                entityId: created.id,
-                changes: {
-                  old: null,
-                  new: created,
-                },
-                createdAt: new Date(),
-              },
-            })
+          return product
+        })
 
-            return created
-          },
-        )
-
-        return reply.status(201).send({ id: product.id })
+        return reply.status(201).send({ id: result.id })
       },
     )
 }

@@ -2,16 +2,8 @@ import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
+import { OrganizationNotFoundError } from '@/errors/domain/organization-errors'
 import { prisma } from '@/lib/prisma'
-
-interface Category {
-  id: string
-  name: string
-  description: string | null
-  isActive: boolean
-  createdAt: Date
-  updatedAt: Date
-}
 
 export async function listCategories(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
@@ -41,11 +33,21 @@ export async function listCategories(app: FastifyInstance) {
     },
     async (request, reply) => {
       const { slug } = request.params
-      const { membership } = await request.getUserMembership(slug)
 
+      // Buscar a organização pelo slug
+      const organization = await prisma.organization.findUnique({
+        where: { slug },
+      })
+
+      if (!organization) {
+        throw new OrganizationNotFoundError()
+      }
+
+      // Buscar as categorias da organização
       const categories = await prisma.category.findMany({
         where: {
-          organizationId: membership.organizationId,
+          organizationId: organization.id,
+          isActive: true, // Opcional: retornar apenas categorias ativas
         },
         orderBy: {
           name: 'asc',
@@ -59,8 +61,9 @@ export async function listCategories(app: FastifyInstance) {
           updatedAt: true,
         },
       })
+
       return reply.send({
-        categories: categories.map((category: Category) => ({
+        categories: categories.map((category) => ({
           ...category,
           createdAt: category.createdAt.toISOString(),
           updatedAt: category.updatedAt.toISOString(),

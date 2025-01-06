@@ -73,7 +73,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
                 ref={(el) => {
                   inputsRef.current[index] = el
                 }}
-                className="h-12 w-12 rounded-lg border-2 border-emerald-600 bg-emerald-100 text-center text-2xl font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-0 dark:bg-emerald-100"
+                className="h-12 w-12 rounded-lg border-2 border-emerald-600 bg-emerald-100 text-center text-2xl font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-0 dark:bg-emerald-100 dark:text-black"
               />
             ))}
           </div>

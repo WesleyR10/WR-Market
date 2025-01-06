@@ -2,6 +2,7 @@ import 'dotenv/config'
 
 import fastifyCors from '@fastify/cors'
 import fastifyJwt from '@fastify/jwt'
+import fastifyMultipart from '@fastify/multipart'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUI from '@fastify/swagger-ui'
 import { env } from '@wr-market/env'
@@ -31,6 +32,7 @@ import {
   deleteCategory,
   deleteClientAddress,
   deleteProduct,
+  deleteProductImages,
   deletePurchase,
   deleteSale,
   deleteStock,
@@ -75,9 +77,13 @@ import {
   updateSale,
   updateStock,
   updateSupplier,
+  uploadProductImages,
 } from '@/http/routes'
 
-const app = fastify().withTypeProvider<ZodTypeProvider>()
+const app = fastify({
+  // Aumenta o limite para 50MB
+  bodyLimit: 52428800, // 50 * 1024 * 1024
+}).withTypeProvider<ZodTypeProvider>()
 
 app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
@@ -213,8 +219,16 @@ app.register(fastifyJwt, {
 
 app.register(fastifyCors, {
   origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+})
+
+app.register(fastifyMultipart, {
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB
+    files: 10, // máximo de 10 arquivos por vez
+  },
 })
 
 // Auth
@@ -240,6 +254,7 @@ app.register(getMembers)
 app.register(updateMember)
 app.register(removeMember)
 app.register(removeMembers)
+
 // Client
 app.register(resetClientPassword)
 app.register(requestPasswordRecover)
@@ -269,6 +284,8 @@ app.register(updateProduct)
 app.register(deleteProduct)
 app.register(getProduct)
 app.register(listProducts)
+app.register(uploadProductImages)
+app.register(deleteProductImages)
 
 // Suppliers
 app.register(createSupplier)

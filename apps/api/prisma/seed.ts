@@ -408,7 +408,7 @@ async function seed() {
             name: faker.commerce.productName(),
             description: faker.commerce.productDescription(),
             price: faker.number.float({ min: 1, max: 1000, fractionDigits: 2 }),
-            imageUrl: faker.image.url(),
+            images: [faker.image.url()],
             isActive: faker.datatype.boolean(), // Campo isActive aleatório
             organizationId: organizationWRSupermarket.id,
             categoryId: category.id,

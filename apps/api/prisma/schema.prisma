@@ -237,7 +237,15 @@ model Product {
   description    String?
   price          Decimal  @db.Decimal(10, 2)
   isActive       Boolean  @default(true) @map("is_active")
-  imageUrl       String?  @map("image_url")
+  sku            String?  @unique // Código único do produto
+  barcode        String?  @unique // Código de barras
+  brand          String? // Marca
+  weight         Float? // Peso
+  unit           String? // Unidade de medida (kg, un, etc)
+  costPrice      Decimal? @map("cost_price") @db.Decimal(10, 2) // Preço de custo
+  minStock       Int?     @map("min_stock") // Estoque mínimo
+  maxStock       Int?     @map("max_stock") // Estoque máximo
+  images         String[] // URLs das imagens
   organizationId String   @map("organization_id")
   categoryId     String   @map("category_id")
   createdById    String   @map("created_by_id")

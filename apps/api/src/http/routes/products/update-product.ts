@@ -10,6 +10,7 @@ import {
 } from '@/errors/domain/product-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { R2StorageService } from '@/services/r2-storage'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function updateProduct(app: FastifyInstance) {
@@ -32,8 +33,9 @@ export async function updateProduct(app: FastifyInstance) {
             description: z.string().optional(),
             price: z.number().positive().optional(),
             categoryId: z.string().uuid().optional(),
-            imageUrl: z.string().url().optional(),
+            images: z.array(z.string()).optional(),
             isActive: z.boolean().optional(),
+            imagesToDelete: z.array(z.string()).optional(),
           }),
           response: {
             204: z.object({
@@ -44,8 +46,18 @@ export async function updateProduct(app: FastifyInstance) {
       },
       async (request, reply) => {
         const { slug, id } = request.params
+        const {
+          name,
+          description,
+          price,
+          categoryId,
+          images,
+          isActive,
+          imagesToDelete,
+        } = request.body
         const userId = await request.getCurrentUserId()
-        const { membership } = await request.getUserMembership(slug)
+        const { membership, organization } =
+          await request.getUserMembership(slug)
 
         const product = await prisma.product.findUnique({
           where: {
@@ -66,10 +78,47 @@ export async function updateProduct(app: FastifyInstance) {
           throw new ProductUpdateNotAllowedError()
         }
 
+        const uploadedImageUrls: string[] = []
+
+        // Upload de novas imagens
+        if (images && images.length > 0) {
+          for (const image of images) {
+            const imageUrl = await R2StorageService.uploadImage(
+              image,
+              organization.slug,
+              product.name,
+            )
+            if (imageUrl) {
+              uploadedImageUrls.push(imageUrl)
+            }
+          }
+        }
+
+        // Deletar imagens
+        if (imagesToDelete && imagesToDelete.length > 0) {
+          await Promise.all(
+            imagesToDelete.map((imageUrl) =>
+              R2StorageService.deleteImage(imageUrl),
+            ),
+          )
+        }
+
         await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
           const updated = await tx.product.update({
-            where: { id },
-            data: request.body,
+            where: {
+              id,
+              organizationId: membership.organizationId,
+            },
+            data: {
+              name,
+              description,
+              price,
+              categoryId,
+              isActive,
+              images: images
+                ? [...(product?.images || []), ...uploadedImageUrls]
+                : undefined,
+            },
           })
 
           await tx.auditLog.create({
