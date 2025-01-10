@@ -2,7 +2,7 @@ import { Role } from '@wr-market/auth'
 
 import { api } from '../api-client'
 
-interface GetInvitesResponse {
+interface ListInvitesResponse {
   invites: {
     id: string
     role: Role
@@ -11,18 +11,17 @@ interface GetInvitesResponse {
     author: {
       id: string
       name: string | null
+      avatarUrl: string | null
     } | null
   }[]
 }
 
-export async function getInvites(org: string) {
-  const result = await api
+export async function listInvites(org: string) {
+  return await api
     .get(`organizations/${org}/invites`, {
       next: {
         tags: [`${org}/invites`],
       },
     })
-    .json<GetInvitesResponse>()
-
-  return result
+    .json<ListInvitesResponse>()
 }

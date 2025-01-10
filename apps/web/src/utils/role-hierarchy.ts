@@ -17,7 +17,7 @@ export const ROLE_HIERARCHY: Record<Role, readonly Role[]> = {
     'ENTREGADOR',
   ],
   GERENTE_VENDAS: ['VENDEDOR'],
-  GERENTE_ESTOQUE: ['ESTOQUISTA'],
+  GERENTE_ESTOQUE: ['ESTOQUISTA', 'ENTREGADOR'],
   VENDEDOR: [],
   ESTOQUISTA: [],
   ENTREGADOR: [],

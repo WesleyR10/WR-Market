@@ -100,4 +100,19 @@ export const ErrorMessages = {
     INVALID_FILE_TYPE: 'Tipo de arquivo inválido',
     FILE_TOO_LARGE: 'Arquivo muito grande',
   },
+  INVITE: {
+    NOT_FOUND: 'Convite não encontrado',
+    CREATE_NOT_ALLOWED: 'Você não tem permissão para criar convites',
+    DELETE_NOT_ALLOWED: 'Você não tem permissão para deletar este convite',
+    HIERARCHY_ERROR: 'Você não tem permissão para gerenciar este convite',
+    EMAIL_IN_USE:
+      'Este email já possui um convite pendente para esta organização',
+    MEMBER_EXISTS: 'Este usuário já é membro desta organização',
+    INVALID_ROLE: 'Cargo inválido para convite',
+    EXPIRED: 'Este convite expirou',
+    ALREADY_ACCEPTED: 'Este convite já foi aceito',
+    BELONGS_TO_ANOTHER_USER: 'Este convite pertence a outro usuário',
+    INVALID_DOMAIN:
+      'Usuários com este domínio serão adicionados automaticamente à organização ao fazer login',
+  },
 } as const

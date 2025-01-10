@@ -174,10 +174,6 @@ const data = {
           title: 'Convites',
           url: '/team/invites',
         },
-        {
-          title: 'Funções',
-          url: '/team/roles',
-        },
       ],
     },
     {

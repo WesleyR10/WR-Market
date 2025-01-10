@@ -16,6 +16,7 @@ import {
 
 import { errorHandler } from '@/http/middlewares/error-handler'
 import {
+  acceptInvite,
   authenticateClient,
   authenticateWithGoogle,
   authenticateWithPassword,
@@ -23,6 +24,7 @@ import {
   createCategory,
   createClientAccount,
   createClientAddress,
+  createInvite,
   createOrganization,
   createProduct,
   createPurchase,
@@ -39,10 +41,13 @@ import {
   deleteSupplier,
   getCategory,
   getClientProfile,
+  getInvite,
+  getInvites,
   getMembers,
   getMembership,
   getOrganization,
   getOrganizations,
+  getPendingInvites,
   getProduct,
   getProfile,
   getPurchase,
@@ -56,12 +61,14 @@ import {
   listSales,
   listStocks,
   listSuppliers,
+  rejectInvite,
   removeMember,
   removeMembers,
   requestClientPasswordRecover,
   requestPasswordRecover,
   resetClientPassword,
   resetPassword,
+  revokeInvite,
   setMainClientAddress,
   shutdownOrganization,
   transferOrganization,
@@ -130,6 +137,10 @@ app.register(fastifySwagger, {
       {
         name: 'Organizations',
         description: 'Gestão de organizações/filiais',
+      },
+      {
+        name: 'Invites',
+        description: 'Gestão de convites',
       },
       {
         name: 'Members',
@@ -254,6 +265,15 @@ app.register(getMembers)
 app.register(updateMember)
 app.register(removeMember)
 app.register(removeMembers)
+
+// Invites
+app.register(createInvite)
+app.register(getInvite)
+app.register(getInvites)
+app.register(getPendingInvites)
+app.register(acceptInvite)
+app.register(rejectInvite)
+app.register(revokeInvite)
 
 // Client
 app.register(resetClientPassword)

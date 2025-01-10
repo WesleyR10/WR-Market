@@ -22,6 +22,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
 
   GERENTE_GERAL(user, { can, cannot }) {
     can('manage', 'Product')
+    can('manage', 'Invite')
     can('manage', 'Category')
     can('manage', 'User')
     can('manage', 'Client')
@@ -46,6 +47,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
     can(['get', 'export'], 'Report')
     can('get', 'Product')
     can('get', 'Category')
+    can('manage', 'Invite')
     can('manage', 'User', {
       role: { $eq: 'VENDEDOR' },
     })
@@ -55,6 +57,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
     can('manage', 'Stock')
     can('manage', 'Product')
     can('manage', 'Category')
+    can('manage', 'Invite')
     can(['get', 'export'], 'Report')
     can('manage', 'User', {
       role: { $eq: 'ESTOQUISTA' },

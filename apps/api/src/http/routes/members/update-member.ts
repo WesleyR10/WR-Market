@@ -49,9 +49,26 @@ export async function updateMember(app: FastifyInstance) {
 
         const { role, status } = request.body
 
-        const canManage = request.canManageRole(membership.role, role)
-        if (!canManage) {
-          throw new RoleHierarchyError()
+        if (role) {
+          const canManageRole = request.canManageRole(membership.role, role)
+          if (!canManageRole) {
+            throw new RoleHierarchyError()
+          }
+        }
+
+        if (status) {
+          const targetMember = await prisma.member.findUnique({
+            where: { id: memberId },
+            select: { role: true },
+          })
+
+          const canManageStatus = request.canManageRole(
+            membership.role,
+            targetMember?.role,
+          )
+          if (!canManageStatus) {
+            throw new RoleHierarchyError()
+          }
         }
 
         await prisma.member.update({
