@@ -99,10 +99,7 @@ export function InviteDialog({
     }
   }
 
-  console.log('userRole', userRole)
   const availableRoles = ASSIGNABLE_ROLES[userRole] || []
-  console.log('ASSIGNABLE_ROLES', ASSIGNABLE_ROLES)
-  console.log('availableRoles para', userRole, ':', availableRoles)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

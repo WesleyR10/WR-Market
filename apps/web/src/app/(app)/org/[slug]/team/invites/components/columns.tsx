@@ -58,11 +58,6 @@ export const columns: ColumnDef<Invite>[] = [
       const author = row.getValue('author') as Invite['author']
       if (!author) return 'N/A'
 
-      console.log('Author completo:', {
-        ...author,
-        avatarUrl: author.avatarUrl,
-      })
-
       return (
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
@@ -73,11 +68,11 @@ export const columns: ColumnDef<Invite>[] = [
             <AvatarFallback>
               {author.name
                 ? author.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .slice(0, 2)
-                  .join('')
-                  .toUpperCase()
+                    .split(' ')
+                    .map((n) => n[0])
+                    .slice(0, 2)
+                    .join('')
+                    .toUpperCase()
                 : 'NA'}
             </AvatarFallback>
           </Avatar>
