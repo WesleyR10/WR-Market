@@ -2,6 +2,7 @@
 
 import { ChevronRight, type LucideIcon } from 'lucide-react'
 
+import { Badge } from '@/components/ui/badge'
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,6 +18,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
+import { usePendingInvites } from '@/hooks/use-pending-invites'
 
 export function NavMain({
   items,
@@ -33,28 +35,41 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const { data: pendingInvites } = usePendingInvites()
+  const pendingInvitesCount = pendingInvites?.invites.length ?? 0
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) =>
-          !item.items?.length ? (
+        {items.map((item) => {
+          const showBadge = item.title === 'Equipe' && pendingInvitesCount > 0
+
+          return !item.items?.length ? (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}
-                className={`relative w-full group-data-[collapsible=icon]:justify-center ${
+                className={`relative flex w-full items-center group-data-[collapsible=icon]:justify-center ${
                   item.isActive
                     ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                     : ''
                 }`}
               >
                 <a href={item.url}>
-                  <span className="relative flex items-center gap-2">
+                  <span className="relative flex w-full items-center gap-2">
                     {item.icon && <item.icon className="shrink-0" />}
-                    <span className="group-data-[collapsible=icon]:hidden">
+                    <span className="truncate group-data-[collapsible=icon]:hidden">
                       {item.title}
                     </span>
+                    {showBadge && (
+                      <Badge
+                        variant="secondary"
+                        className="ml-auto bg-primary text-primary-foreground"
+                      >
+                        {pendingInvitesCount}
+                      </Badge>
+                    )}
                   </span>
                 </a>
               </SidebarMenuButton>
@@ -103,8 +118,8 @@ export function NavMain({
                 </CollapsibleContent>
               </SidebarMenuItem>
             </Collapsible>
-          ),
-        )}
+          )
+        })}
       </SidebarMenu>
     </SidebarGroup>
   )

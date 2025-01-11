@@ -25,7 +25,11 @@ export default function InvitesPage() {
   const params = useParams()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [data, setData] = useState<InviteDataType>(null)
-  const { data: invitesData, isLoading: isLoadingInvites } = useInvites()
+  const {
+    data: invitesData,
+    isLoading: isLoadingInvites,
+    isForbidden,
+  } = useInvites()
 
   useEffect(() => {
     async function fetchData() {
@@ -35,7 +39,7 @@ export default function InvitesPage() {
     fetchData()
   }, [params.slug])
 
-  if (!data) {
+  if (!data?.membership) {
     return null
   }
 
@@ -52,6 +56,12 @@ export default function InvitesPage() {
 
       {isLoadingInvites ? (
         <div>Carregando convites...</div>
+      ) : isForbidden ? (
+        <div className="flex h-[200px] items-center justify-center rounded-lg border border-dashed">
+          <p className="text-sm text-muted-foreground">
+            Você não tem permissão para acessar este recurso
+          </p>
+        </div>
       ) : (
         <DataTable columns={columns} data={invitesData?.invites || []} />
       )}
