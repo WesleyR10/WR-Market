@@ -11,6 +11,7 @@ import {
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
 import { R2StorageService } from '@/services/r2-storage'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function updateProduct(app: FastifyInstance) {
@@ -131,7 +132,7 @@ export async function updateProduct(app: FastifyInstance) {
                 old: product,
                 new: updated,
               },
-              createdAt: new Date(),
+              createdAt: dateUtils.toDate(new Date()),
             },
           })
         })

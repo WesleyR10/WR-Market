@@ -9,6 +9,7 @@ import {
 } from '@/errors/domain/invite-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function rejectInvite(app: FastifyInstance) {
   app
@@ -56,10 +57,26 @@ export async function rejectInvite(app: FastifyInstance) {
           throw new InviteBelongsToAnotherUserError()
         }
 
-        await prisma.invite.delete({
-          where: {
-            id: invite.id,
-          },
+        await prisma.$transaction(async (tx) => {
+          await tx.invite.delete({
+            where: {
+              id: invite.id,
+            },
+          })
+
+          await tx.auditLog.create({
+            data: {
+              memberId: userId,
+              action: 'REJECT',
+              entity: 'Invite',
+              entityId: invite.id,
+              changes: {
+                old: invite,
+                new: null,
+              },
+              createdAt: dateUtils.toDate(new Date()),
+            },
+          })
         })
 
         return reply.status(204).send()

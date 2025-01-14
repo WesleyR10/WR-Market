@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import { InvalidTokenError } from '@/errors/domain/auth-errors'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function resetPassword(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -37,8 +38,7 @@ export async function resetPassword(app: FastifyInstance) {
           id: code,
           type: 'PASSWORD_RECOVER',
           createdAt: {
-            // Token válido por 30 minutos
-            gte: new Date(Date.now() - 30 * 60 * 1000),
+            gte: dateUtils.addMinutes(new Date(), -30),
           },
         },
         include: {

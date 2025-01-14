@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { StockGetNotAllowedError } from '@/errors/domain/stock-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function listStocks(app: FastifyInstance) {
@@ -39,7 +40,7 @@ export async function listStocks(app: FastifyInstance) {
                     id: z.string().uuid(),
                     name: z.string(),
                     price: z.number(),
-                    imageUrl: z.string().nullable(),
+                    images: z.array(z.string()).nullable(),
                     isActive: z.boolean(),
                   }),
                 }),
@@ -86,7 +87,7 @@ export async function listStocks(app: FastifyInstance) {
                   id: true,
                   name: true,
                   price: true,
-                  imageUrl: true,
+                  images: true,
                   isActive: true,
                 },
               },
@@ -113,17 +114,19 @@ export async function listStocks(app: FastifyInstance) {
           stocks: stocks.map((stock) => ({
             id: stock.id,
             quantity: stock.quantity,
-            createdAt: stock.createdAt.toISOString(),
-            updatedAt: stock.updatedAt.toISOString(),
+            createdAt: dateUtils.toISO(stock.createdAt),
+            updatedAt: dateUtils.toISO(stock.updatedAt),
             product: {
               ...stock.Product,
               price: Number(stock.Product.price),
+              images: stock.Product.images,
+              isActive: stock.Product.isActive,
             },
           })),
           pagination: {
+            total,
             page,
             perPage,
-            total,
             totalPages: Math.ceil(total / perPage),
           },
         })

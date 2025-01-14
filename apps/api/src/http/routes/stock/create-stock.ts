@@ -9,6 +9,7 @@ import {
 } from '@/errors/domain/stock-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function createStock(app: FastifyInstance) {
@@ -81,8 +82,9 @@ export async function createStock(app: FastifyInstance) {
                   quantity,
                   organizationId: membership.organizationId,
                   memberId: membership.id,
+                  createdAt: dateUtils.toISO(new Date()),
                 },
-                createdAt: new Date(),
+                createdAt: dateUtils.toISO(new Date()),
               },
             })
 

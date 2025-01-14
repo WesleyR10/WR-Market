@@ -8,6 +8,7 @@ import {
 } from '@/errors/domain/sale-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function getSale(app: FastifyInstance) {
   app
@@ -75,22 +76,15 @@ export async function getSale(app: FastifyInstance) {
             total: Number(sale.total),
             status: sale.status,
             source: sale.source,
-            createdAt: sale.createdAt.toISOString(),
-            updatedAt: sale.updatedAt.toISOString(),
+            createdAt: dateUtils.toISO(sale.createdAt),
+            updatedAt: dateUtils.toISO(sale.updatedAt),
             createdBy: sale.createdById ?? undefined,
-            items: sale.items.map(
-              (item: {
-                id: string
-                productId: string
-                quantity: number
-                price: number
-              }) => ({
-                id: item.id,
-                productId: item.productId,
-                quantity: item.quantity,
-                price: Number(item.price),
-              }),
-            ),
+            items: sale.items.map((item) => ({
+              id: item.id,
+              productId: item.productId,
+              quantity: item.quantity,
+              price: item.price.toNumber(),
+            })),
           },
         })
       },

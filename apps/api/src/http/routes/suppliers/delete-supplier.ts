@@ -8,6 +8,7 @@ import {
 } from '@/errors/domain/supplier-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function deleteSupplier(app: FastifyInstance) {
@@ -53,6 +54,21 @@ export async function deleteSupplier(app: FastifyInstance) {
 
         await prisma.supplier.delete({
           where: { id: supplierId },
+        })
+
+        await prisma.auditLog.create({
+          data: {
+            memberId: membership.id,
+            action: 'DELETE',
+            entity: 'Supplier',
+            entityId: supplierId,
+            changes: {
+              old: supplier,
+              new: null,
+              deletedAt: dateUtils.toISO(new Date()),
+            },
+            createdAt: dateUtils.toISO(new Date()),
+          },
         })
 
         return reply.status(204).send({

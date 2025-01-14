@@ -5,12 +5,14 @@ import { z } from 'zod'
 
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 interface Organization {
   id: string
   name: string
   slug: string
   avatarUrl: string | null
+  createdAt: Date
   members: {
     role:
       | 'ADMIN'
@@ -43,6 +45,7 @@ export async function getOrganizations(app: FastifyInstance) {
                   slug: z.string(),
                   avatarUrl: z.string().url().nullable(),
                   role: roleSchema,
+                  createdAt: z.string(),
                 }),
               ),
             }),
@@ -58,6 +61,7 @@ export async function getOrganizations(app: FastifyInstance) {
             name: true,
             slug: true,
             avatarUrl: true,
+            createdAt: true,
             members: {
               select: {
                 role: true,
@@ -81,6 +85,7 @@ export async function getOrganizations(app: FastifyInstance) {
             return {
               ...org,
               role: members[0].role as Organization['members'][0]['role'],
+              createdAt: dateUtils.toISO(org.createdAt),
             }
           },
         )

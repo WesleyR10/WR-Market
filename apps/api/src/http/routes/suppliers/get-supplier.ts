@@ -8,6 +8,7 @@ import {
 } from '@/errors/domain/supplier-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function getSupplier(app: FastifyInstance) {
@@ -71,7 +72,17 @@ export async function getSupplier(app: FastifyInstance) {
           throw new SupplierNotFoundError()
         }
 
-        return reply.status(200).send()
+        return reply.status(200).send({
+          supplier: {
+            id: supplier.id,
+            name: supplier.name,
+            email: supplier.email,
+            phone: supplier.phone,
+            cnpj: supplier.cnpj,
+            createdAt: dateUtils.toISO(supplier.createdAt),
+            updatedAt: dateUtils.toISO(supplier.updatedAt),
+          },
+        })
       },
     )
 }

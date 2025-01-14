@@ -3,6 +3,7 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
 import { auth } from '@/http/middlewares/auth'
+import { dateUtils } from '@/utils/date'
 
 export async function getOrganization(app: FastifyInstance) {
   app
@@ -27,8 +28,8 @@ export async function getOrganization(app: FastifyInstance) {
                 domain: z.string().nullable(),
                 shouldAttachUsersByDomain: z.boolean(),
                 avatarUrl: z.string().url().nullable(),
-                createdAt: z.date(),
-                updatedAt: z.date(),
+                createdAt: z.string(),
+                updatedAt: z.string(),
                 ownerId: z.string().uuid(),
               }),
             }),
@@ -40,7 +41,13 @@ export async function getOrganization(app: FastifyInstance) {
 
         const { organization } = await request.getUserMembership(slug)
 
-        return { organization }
+        return {
+          organization: {
+            ...organization,
+            createdAt: dateUtils.toISO(organization.createdAt),
+            updatedAt: dateUtils.toISO(organization.updatedAt),
+          },
+        }
       },
     )
 }

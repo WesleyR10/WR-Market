@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { ClientNotFoundError } from '@/errors/domain/client-errors'
 import { clientAuth } from '@/http/middlewares/client-auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function getClientProfile(app: FastifyInstance) {
   app
@@ -80,7 +81,9 @@ export async function getClientProfile(app: FastifyInstance) {
         return reply.send({
           client: {
             ...client,
-            birthDate: client.birthDate?.toISOString() || null,
+            birthDate: client.birthDate
+              ? dateUtils.format(client.birthDate, "yyyy-MM-dd'T'HH:mm:ssXXX")
+              : null,
           },
         })
       },

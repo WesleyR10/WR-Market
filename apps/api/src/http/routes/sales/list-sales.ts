@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { SaleGetNotAllowedError } from '@/errors/domain/sale-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function listSales(app: FastifyInstance) {
@@ -20,8 +21,16 @@ export async function listSales(app: FastifyInstance) {
           security: [{ bearerAuth: [] }],
           params: z.object({
             slug: z.string(),
-            page: z.number().int().positive().default(1).optional(),
-            limit: z.number().int().positive().default(10).optional(),
+          }),
+          querystring: z.object({
+            page: z.coerce.number().int().min(1).default(1).optional(),
+            limit: z.coerce
+              .number()
+              .int()
+              .min(1)
+              .max(100)
+              .default(10)
+              .optional(),
           }),
           response: {
             200: z.object({
@@ -37,18 +46,31 @@ export async function listSales(app: FastifyInstance) {
                   updatedAt: z.string(),
                 }),
               ),
+              pagination: z.object({
+                page: z.number().int(),
+                perPage: z.number().int(),
+                total: z.number().int(),
+                totalPages: z.number().int(),
+              }),
             }),
           },
         },
       },
       async (request, reply) => {
-        const { slug, page = 1, limit = 10 } = request.params
+        const { slug } = request.params
+        const { page = 1, limit = 10 } = request.query
         const { membership } = await request.getUserMembership(slug)
 
         const { can } = getUserPermissions(membership.userId, membership.role)
         if (!can('get', 'Sale')) {
           throw new SaleGetNotAllowedError()
         }
+
+        const total = await prisma.sale.count({
+          where: {
+            organizationId: membership.organizationId,
+          },
+        })
 
         const sales = await prisma.sale.findMany({
           where: {
@@ -62,27 +84,22 @@ export async function listSales(app: FastifyInstance) {
         })
 
         return reply.status(200).send({
-          sales: sales.map(
-            (sale: {
-              id: string
-              clientId: string
-              total: number
-              status: string
-              source: string
-              createdById: string | null
-              createdAt: Date
-              updatedAt: Date
-            }) => ({
-              id: sale.id,
-              clientId: sale.clientId,
-              total: Number(sale.total),
-              status: sale.status,
-              source: sale.source,
-              createdBy: sale.createdById ?? undefined,
-              createdAt: sale.createdAt.toISOString(),
-              updatedAt: sale.updatedAt.toISOString(),
-            }),
-          ),
+          sales: sales.map((sale) => ({
+            id: sale.id,
+            clientId: sale.clientId,
+            total: sale.total.toNumber(),
+            status: sale.status,
+            source: sale.source,
+            createdBy: sale.createdById ?? undefined,
+            createdAt: dateUtils.toISO(sale.createdAt),
+            updatedAt: dateUtils.toISO(sale.updatedAt),
+          })),
+          pagination: {
+            page,
+            perPage: limit,
+            total,
+            totalPages: Math.ceil(total / limit),
+          },
         })
       },
     )

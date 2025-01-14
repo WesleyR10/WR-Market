@@ -11,6 +11,7 @@ import {
 } from '@/errors/domain/member-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 // Atualizando a interface para corresponder ao retorno do Prisma
@@ -18,6 +19,7 @@ interface PrismaMember {
   id: string
   role: Role
   status: MembershipStatus
+  createdAt: Date
   user: {
     id: string
     name: string | null
@@ -45,14 +47,17 @@ export async function getMembers(app: FastifyInstance) {
             200: z.object({
               members: z.array(
                 z.object({
-                  id: z.string().uuid(),
-                  userId: z.string().uuid(),
+                  id: z.string(),
                   role: roleSchema,
-                  name: z.string().nullable(),
-                  email: z.string().email(),
-                  avatarUrl: z.string().url().nullable(),
-                  status: z.nativeEnum(MembershipStatus),
-                  phone: z.string().nullable(),
+                  status: z.enum(['ACTIVE', 'INACTIVE']),
+                  createdAt: z.string(),
+                  user: z.object({
+                    id: z.string(),
+                    name: z.string().nullable(),
+                    email: z.string(),
+                    phone: z.string().nullable(),
+                    avatarUrl: z.string().nullable(),
+                  }),
                 }),
               ),
             }),
@@ -79,6 +84,7 @@ export async function getMembers(app: FastifyInstance) {
             id: true,
             role: true,
             status: true,
+            createdAt: true,
             user: {
               select: {
                 id: true,
@@ -106,13 +112,16 @@ export async function getMembers(app: FastifyInstance) {
 
           return {
             id: member.id,
-            userId: member.user.id,
             role: member.role,
             status: member.status,
-            name: member.user.name,
-            email: member.user.email,
-            phone: member.user.phone,
-            avatarUrl: member.user.avatarUrl,
+            createdAt: dateUtils.toISO(member.createdAt),
+            user: {
+              id: member.user.id,
+              name: member.user.name,
+              email: member.user.email,
+              phone: member.user.phone,
+              avatarUrl: member.user.avatarUrl,
+            },
           }
         })
 

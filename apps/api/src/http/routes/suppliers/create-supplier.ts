@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { SupplierCreateNotAllowedError } from '@/errors/domain/supplier-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function createSupplier(app: FastifyInstance) {
@@ -60,12 +61,12 @@ export async function createSupplier(app: FastifyInstance) {
                 memberId: membership.id,
                 action: 'CREATE',
                 entity: 'Supplier',
-                entityId: supplier.id,
+                entityId: created.id,
                 changes: {
                   old: null,
-                  new: supplier,
+                  new: created,
                 },
-                createdAt: new Date(),
+                createdAt: dateUtils.toISO(new Date()),
               },
             })
 

@@ -3,6 +3,7 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function listProducts(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
@@ -62,7 +63,12 @@ export async function listProducts(app: FastifyInstance) {
       ])
 
       return reply.send({
-        products,
+        products: products.map((product) => ({
+          ...product,
+          createdAt: dateUtils.toISO(product.createdAt),
+          updatedAt: dateUtils.toISO(product.updatedAt),
+          price: Number(product.price),
+        })),
         pagination: {
           page,
           perPage,

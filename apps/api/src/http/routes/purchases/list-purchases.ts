@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { PurchaseGetNotAllowedError } from '@/errors/domain/purchase-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 interface Purchase {
@@ -97,8 +98,8 @@ export async function listPurchases(app: FastifyInstance) {
         return reply.send({
           purchases: purchases.map((purchase: Purchase) => ({
             ...purchase,
-            createdAt: purchase.createdAt.toISOString(),
-            updatedAt: purchase.updatedAt.toISOString(),
+            createdAt: dateUtils.toISO(purchase.createdAt),
+            updatedAt: dateUtils.toISO(purchase.updatedAt),
             total: purchase.total.toNumber(),
           })),
           pagination: {

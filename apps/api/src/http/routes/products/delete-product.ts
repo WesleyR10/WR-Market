@@ -10,6 +10,7 @@ import {
 } from '@/errors/domain/product-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function deleteProduct(app: FastifyInstance) {
@@ -81,7 +82,7 @@ export async function deleteProduct(app: FastifyInstance) {
                 old: product,
                 new: null,
               },
-              createdAt: new Date(),
+              createdAt: dateUtils.toDate(new Date()),
             },
           })
         })

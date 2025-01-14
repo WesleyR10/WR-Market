@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { SaleCreateNotAllowedError } from '@/errors/domain/sale-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function createSale(app: FastifyInstance) {
@@ -66,6 +67,7 @@ export async function createSale(app: FastifyInstance) {
                 createdById: sellerId || null,
                 source: sellerId ? 'ADMIN' : 'ECOMMERCE',
                 organizationId: membership.organizationId,
+                createdAt: dateUtils.toDate(new Date()),
               },
             })
 
@@ -91,7 +93,7 @@ export async function createSale(app: FastifyInstance) {
                   items,
                   total: createdSale.total,
                 },
-                createdAt: new Date(),
+                createdAt: dateUtils.toDate(new Date()),
               },
             })
 

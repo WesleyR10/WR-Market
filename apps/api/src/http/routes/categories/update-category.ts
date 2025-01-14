@@ -10,6 +10,7 @@ import {
 } from '@/errors/domain/category-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function updateCategory(app: FastifyInstance) {
@@ -81,7 +82,7 @@ export async function updateCategory(app: FastifyInstance) {
                   description: updated.description,
                 },
               },
-              createdAt: new Date(),
+              createdAt: dateUtils.toDate(new Date()),
             },
           })
         })

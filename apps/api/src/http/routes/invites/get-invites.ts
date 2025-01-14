@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { InviteCreateNotAllowedError } from '@/errors/domain/invite-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function getInvites(app: FastifyInstance) {
@@ -29,7 +30,7 @@ export async function getInvites(app: FastifyInstance) {
                   id: z.string().uuid(),
                   role: roleSchema,
                   email: z.string().email(),
-                  createdAt: z.date(),
+                  createdAt: z.string(),
                   author: z
                     .object({
                       id: z.string().uuid(),
@@ -86,7 +87,7 @@ export async function getInvites(app: FastifyInstance) {
             id: invite.id,
             email: invite.email,
             role: invite.role,
-            createdAt: invite.createdAt,
+            createdAt: dateUtils.toISO(invite.createdAt),
             author: invite.author
               ? {
                   id: invite.author.id,

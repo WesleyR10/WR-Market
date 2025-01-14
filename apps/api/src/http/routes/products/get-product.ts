@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { ProductNotFoundError } from '@/errors/domain/product-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function getProduct(app: FastifyInstance) {
   app
@@ -88,8 +89,8 @@ export async function getProduct(app: FastifyInstance) {
         return reply.send({
           product: {
             ...product,
-            createdAt: product.createdAt.toISOString(),
-            updatedAt: product.updatedAt.toISOString(),
+            createdAt: dateUtils.toISO(product.createdAt),
+            updatedAt: dateUtils.toISO(product.updatedAt),
             price: Number(product.price),
           },
         })

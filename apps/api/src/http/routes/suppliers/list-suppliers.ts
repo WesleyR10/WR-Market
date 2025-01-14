@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function listSuppliers(app: FastifyInstance) {
   app
@@ -81,8 +82,8 @@ export async function listSuppliers(app: FastifyInstance) {
         return reply.status(200).send({
           suppliers: suppliers.map((supplier) => ({
             ...supplier,
-            createdAt: supplier.createdAt.toISOString(),
-            updatedAt: supplier.updatedAt.toISOString(),
+            createdAt: dateUtils.toISO(supplier.createdAt),
+            updatedAt: dateUtils.toISO(supplier.updatedAt),
           })),
           pagination: {
             total,

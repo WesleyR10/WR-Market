@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { UserNotFoundError } from '@/errors/domain/auth-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function getPendingInvites(app: FastifyInstance) {
   app
@@ -24,7 +25,7 @@ export async function getPendingInvites(app: FastifyInstance) {
                   id: z.string().uuid(),
                   role: roleSchema,
                   email: z.string().email(),
-                  createdAt: z.date(),
+                  createdAt: z.string(),
                   organization: z.object({
                     name: z.string(),
                     slug: z.string(),
@@ -89,7 +90,7 @@ export async function getPendingInvites(app: FastifyInstance) {
           id: invite.id,
           email: invite.email,
           role: invite.role,
-          createdAt: invite.createdAt,
+          createdAt: dateUtils.toISO(invite.createdAt),
           organization: {
             name: invite.organization.name,
             slug: invite.organization.slug,

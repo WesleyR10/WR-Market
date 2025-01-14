@@ -6,6 +6,7 @@ import { CategoryNotBelongsToOrganizationError } from '@/errors/domain/category-
 import { ProductCreateNotAllowedError } from '@/errors/domain/product-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function createProduct(app: FastifyInstance) {
@@ -107,7 +108,7 @@ export async function createProduct(app: FastifyInstance) {
                 old: null,
                 new: product,
               },
-              createdAt: new Date(),
+              createdAt: dateUtils.toDate(new Date()),
             },
           })
 

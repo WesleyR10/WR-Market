@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { InvalidTokenError } from '@/errors/domain/auth-errors'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function twoFactorRoutes(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -36,7 +37,7 @@ export async function twoFactorRoutes(app: FastifyInstance) {
           type: 'TWO_FACTOR',
           createdAt: {
             // Token válido por 5 minutos
-            gte: new Date(Date.now() - 5 * 60 * 1000),
+            gte: dateUtils.addMinutes(new Date(), -5),
           },
         },
         include: {

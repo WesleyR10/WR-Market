@@ -8,6 +8,7 @@ import {
 } from '@/errors/domain/sale-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function deleteSale(app: FastifyInstance) {
@@ -67,7 +68,7 @@ export async function deleteSale(app: FastifyInstance) {
                   status: sale.status,
                 },
               },
-              createdAt: new Date(),
+              createdAt: dateUtils.toDate(new Date()),
             },
           }),
         ])

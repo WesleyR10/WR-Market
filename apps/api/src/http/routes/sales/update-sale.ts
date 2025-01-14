@@ -9,6 +9,7 @@ import {
 } from '@/errors/domain/sale-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function updateSale(app: FastifyInstance) {
@@ -72,7 +73,10 @@ export async function updateSale(app: FastifyInstance) {
           if (status) {
             await tx.sale.update({
               where: { id: saleId },
-              data: { status },
+              data: {
+                status,
+                updatedAt: dateUtils.toDate(new Date()),
+              },
             })
           }
 
@@ -102,7 +106,7 @@ export async function updateSale(app: FastifyInstance) {
                 status,
                 items,
               },
-              createdAt: new Date(),
+              createdAt: dateUtils.toDate(new Date()),
             },
           })
         })

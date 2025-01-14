@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { CategoryNotFoundError } from '@/errors/domain/category-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function getCategory(app: FastifyInstance) {
   app
@@ -59,8 +60,8 @@ export async function getCategory(app: FastifyInstance) {
         return reply.send({
           category: {
             ...category,
-            createdAt: category.createdAt.toISOString(),
-            updatedAt: category.updatedAt.toISOString(),
+            createdAt: dateUtils.toISO(category.createdAt),
+            updatedAt: dateUtils.toISO(category.updatedAt),
           },
         })
       },

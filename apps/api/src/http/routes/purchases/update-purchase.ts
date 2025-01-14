@@ -10,6 +10,7 @@ import {
 } from '@/errors/domain/purchase-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function updatePurchase(app: FastifyInstance) {
@@ -88,7 +89,7 @@ export async function updatePurchase(app: FastifyInstance) {
             where: { id: purchaseId },
             data: {
               ...updateData,
-              updatedAt: new Date(),
+              updatedAt: dateUtils.toDate(new Date()),
               items: updateData.items
                 ? {
                     updateMany: updateData.items.map(
@@ -125,7 +126,7 @@ export async function updatePurchase(app: FastifyInstance) {
                 old: purchase,
                 new: updated,
               },
-              createdAt: new Date(),
+              createdAt: dateUtils.toDate(new Date()),
             },
           })
         })

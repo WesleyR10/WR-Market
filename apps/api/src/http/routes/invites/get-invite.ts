@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { InviteNotFoundError } from '@/errors/domain/invite-errors'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function getInvite(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
@@ -22,7 +23,7 @@ export async function getInvite(app: FastifyInstance) {
               id: z.string().uuid(),
               role: roleSchema,
               email: z.string().email(),
-              createdAt: z.date(),
+              createdAt: z.string(),
               organization: z.object({
                 name: z.string(),
               }),
@@ -53,8 +54,12 @@ export async function getInvite(app: FastifyInstance) {
           author: {
             select: {
               id: true,
-              name: true,
-              avatarUrl: true,
+              user: {
+                select: {
+                  name: true,
+                  avatarUrl: true,
+                },
+              },
             },
           },
           organization: {
@@ -69,7 +74,24 @@ export async function getInvite(app: FastifyInstance) {
         throw new InviteNotFoundError()
       }
 
-      return { invite }
+      return {
+        invite: {
+          id: invite.id,
+          role: invite.role,
+          email: invite.email,
+          createdAt: dateUtils.toISO(invite.createdAt),
+          organization: {
+            name: invite.organization.name,
+          },
+          author: invite.author
+            ? {
+                id: invite.author.id,
+                name: invite.author.user?.name ?? null,
+                avatarUrl: invite.author.user?.avatarUrl ?? null,
+              }
+            : null,
+        },
+      }
     },
   )
 }

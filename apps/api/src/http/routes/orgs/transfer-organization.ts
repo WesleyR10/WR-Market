@@ -9,6 +9,7 @@ import {
 } from '@/errors/domain/organization-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function transferOrganization(app: FastifyInstance) {
@@ -90,6 +91,7 @@ export async function transferOrganization(app: FastifyInstance) {
               fromUserId: organization.ownerId,
               toUserId: transferToUserId,
             },
+            createdAt: dateUtils.toDate(new Date()),
           },
         })
 

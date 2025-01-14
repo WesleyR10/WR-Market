@@ -8,6 +8,7 @@ import {
 } from '@/errors/domain/stock-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function getStock(app: FastifyInstance) {
@@ -37,7 +38,7 @@ export async function getStock(app: FastifyInstance) {
                   name: z.string(),
                   description: z.string().nullable(),
                   price: z.number(),
-                  imageUrl: z.string().nullable(),
+                  images: z.array(z.string()).nullable(),
                   isActive: z.boolean(),
                   categoryId: z.string().uuid(),
                 }),
@@ -76,14 +77,14 @@ export async function getStock(app: FastifyInstance) {
           stock: {
             id: stock.id,
             quantity: stock.quantity,
-            createdAt: stock.createdAt.toISOString(),
-            updatedAt: stock.updatedAt.toISOString(),
+            createdAt: dateUtils.toISO(stock.createdAt),
+            updatedAt: dateUtils.toISO(stock.updatedAt),
             product: {
               id: stock.Product.id,
               name: stock.Product.name,
               description: stock.Product.description,
-              price: Number(stock.Product.price), // Convertendo Decimal para Number
-              imageUrl: stock.Product.imageUrl,
+              price: Number(stock.Product.price),
+              images: stock.Product.images,
               isActive: stock.Product.isActive,
               categoryId: stock.Product.categoryId,
             },

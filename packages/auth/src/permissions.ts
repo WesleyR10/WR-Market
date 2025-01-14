@@ -106,6 +106,7 @@ export const permissions: Record<Role, PermissionsByRole> = {
   ENTREGADOR(user, { can, cannot }) {
     can(['get', 'update'], 'Delivery')
     can('get', 'Client')
+    can('get', 'User')
 
     // Entregador só pode atualizar entregas atribuídas a ele
     cannot('update', 'Delivery')

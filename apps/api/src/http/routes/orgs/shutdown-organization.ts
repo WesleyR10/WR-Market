@@ -6,6 +6,7 @@ import { z } from 'zod'
 import { OrganizationDeleteNotAllowedError } from '@/errors/domain/organization-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function shutdownOrganization(app: FastifyInstance) {
@@ -41,10 +42,26 @@ export async function shutdownOrganization(app: FastifyInstance) {
           throw new OrganizationDeleteNotAllowedError()
         }
 
-        await prisma.organization.delete({
-          where: {
-            id: organization.id,
-          },
+        await prisma.$transaction(async (tx) => {
+          await tx.organization.delete({
+            where: {
+              id: organization.id,
+            },
+          })
+
+          await tx.auditLog.create({
+            data: {
+              memberId: membership.id,
+              action: 'DELETE',
+              entity: 'Organization',
+              entityId: organization.id,
+              changes: {
+                old: organization,
+                new: null,
+              },
+              createdAt: dateUtils.toDate(new Date()),
+            },
+          })
         })
 
         return reply.status(204).send()

@@ -9,6 +9,7 @@ import {
 } from '@/errors/domain/purchase-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 interface Item {
@@ -86,8 +87,8 @@ export async function getPurchase(app: FastifyInstance) {
           purchase: {
             ...purchase,
             total: purchase.total.toNumber(),
-            createdAt: purchase.createdAt.toISOString(),
-            updatedAt: purchase.updatedAt.toISOString(),
+            createdAt: dateUtils.toISO(purchase.createdAt),
+            updatedAt: dateUtils.toISO(purchase.updatedAt),
             items: purchase.items.map((item: Item) => ({
               ...item,
               price: item.price.toNumber(),

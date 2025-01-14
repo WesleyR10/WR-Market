@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { OrganizationNotFoundError } from '@/errors/domain/organization-errors'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function listCategories(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
@@ -65,8 +66,8 @@ export async function listCategories(app: FastifyInstance) {
       return reply.send({
         categories: categories.map((category) => ({
           ...category,
-          createdAt: category.createdAt.toISOString(),
-          updatedAt: category.updatedAt.toISOString(),
+          createdAt: dateUtils.formatDisplay(category.createdAt),
+          updatedAt: dateUtils.formatDisplay(category.updatedAt),
         })),
       })
     },

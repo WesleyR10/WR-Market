@@ -9,6 +9,7 @@ import {
 } from '@/errors/domain/supplier-errors'
 import { auth } from '@/http/middlewares/auth'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 import { getUserPermissions } from '@/utils/get-user-permissions'
 
 export async function updateSupplier(app: FastifyInstance) {
@@ -83,7 +84,7 @@ export async function updateSupplier(app: FastifyInstance) {
                 old: supplier,
                 new: updated,
               },
-              createdAt: new Date(),
+              createdAt: dateUtils.toISO(new Date()),
             },
           })
         })

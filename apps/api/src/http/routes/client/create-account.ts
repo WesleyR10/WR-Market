@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import { CpfInUseError, EmailInUseError } from '@/errors/domain/client-errors'
 import { prisma } from '@/lib/prisma'
+import { dateUtils } from '@/utils/date'
 
 export async function createClientAccount(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
@@ -86,7 +87,7 @@ export async function createClientAccount(app: FastifyInstance) {
           phone,
           cpf,
           passwordHash,
-          birthDate: birthDate ? new Date(birthDate) : undefined,
+          birthDate: birthDate ? dateUtils.toDate(birthDate) : undefined,
           avatarUrl,
           isActive: true,
           addresses: address
